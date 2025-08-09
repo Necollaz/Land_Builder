@@ -16,6 +16,7 @@ public class MainSceneInstaller : MonoInstaller
     [Header("Zoom Settings")]
     [SerializeField] private CinemachineFreeLook _cinemachineFreeLookCamera;
     [SerializeField] private float _zoomSensitivity;
+    [SerializeField] private float _rotarorSensitivity;
     [SerializeField] private float _zoomSpeed;
     [SerializeField] private float _minZoom;
     [SerializeField] private float _maxZoom;
@@ -29,9 +30,13 @@ public class MainSceneInstaller : MonoInstaller
         var tileRotator = Bind(new TileRotateController());
         var tileSpawn = Bind(new TileSpawnController(tilePreview, tileRotator, gridBuilder, cameraController));
         var hexInitializer = Bind(new HexGridInitializer(gridBuilder, tileSpawn, hexDirection));
+        var mouseWheelRotarorInput = Bind(new MouseWheelRotarorInput(_rotarorSensitivity));
+        var touchDragRotatorInput = Bind(new TouchDragRotatorInput(_rotarorSensitivity));
+        var rotatorInputAggregator = Bind(new RotatorInputAggregator(mouseWheelRotarorInput, touchDragRotatorInput));
         var mouseWheelZoomInput = Bind(new MouseWheelZoomInput(_zoomSensitivity));
-        //var TouchPinchZoomInput = Bind(new TouchPinchZoomInput(_zoomSensitivity)); - это под телефоны
-        var cinemachineFreeLookCamera = Bind(new CameraZoomController(_cinemachineFreeLookCamera, mouseWheelZoomInput, _zoomSpeed, _minZoom, _maxZoom));
+        //var TouchPinchZoomInput = Bind(new TouchPinchZoomInput(_zoomSensitivity)); - это под телефоны, добавить агрегатор
+        Bind(new CameraZoomController(_cinemachineFreeLookCamera, mouseWheelZoomInput, _zoomSpeed, _minZoom, _maxZoom));
+        Bind(new CameraRotatorController(_cinemachineFreeLookCamera, rotatorInputAggregator));
     }
 
     private T Bind<T>(T controller) where T : class
