@@ -336,6 +336,7 @@ MonoBehaviour:
   _gridComponent: {fileID: 1154843680}
   _cinemachineFreeLookCamera: {fileID: 676220885}
   _zoomSensitivity: 0.2
+  _rotarorSensitivity: 20
   _zoomSpeed: 3
   _minZoom: 2
   _maxZoom: 15
@@ -537,7 +538,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 273463398}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.23314115, y: 0.64239526, z: -0.21463414, w: 0.69778633}
+  m_LocalRotation: {x: -0.0014554779, y: 0.9484505, z: -0.31689203, w: -0.004356212}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -728,8 +729,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.25738022, y: 0.6345034, z: -0.23694909, w: 0.689214}
-  m_LocalPosition: {x: -36.13958, y: 102.85249, z: -186.85663}
+  m_LocalRotation: {x: -0.0016068262, y: 0.93679875, z: -0.34983853, w: -0.004302765}
+  m_LocalPosition: {x: -26.081831, y: 102.85249, z: -176.03185}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -854,7 +855,6 @@ GameObject:
   m_Component:
   - component: {fileID: 676220886}
   - component: {fileID: 676220885}
-  - component: {fileID: 676220887}
   m_Layer: 0
   m_Name: FreeLook Camera
   m_TagString: Untagged
@@ -976,7 +976,7 @@ Transform:
   m_GameObject: {fileID: 676220884}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -36.13958, y: 102.85249, z: -186.85663}
+  m_LocalPosition: {x: -26.081831, y: 102.85249, z: -176.03185}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -985,19 +985,6 @@ Transform:
   - {fileID: 273463400}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &676220887
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 676220884}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 71739a4b686dd5a4ba26f831981bd7a9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _cinemachineFreeLookCamera: {fileID: 676220885}
 --- !u!1 &833106263
 GameObject:
   m_ObjectHideFlags: 3
@@ -1069,7 +1056,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 833106263}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.28154185, y: 0.6257464, z: -0.25919268, w: 0.679702}
+  m_LocalRotation: {x: -0.001757645, y: 0.9238698, z: -0.38267952, w: -0.0042433296}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1352,7 +1339,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1467367389}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.25738028, y: 0.6345034, z: -0.23694909, w: 0.68921405}
+  m_LocalRotation: {x: -0.0016068195, y: 0.9367988, z: -0.34983847, w: -0.004302748}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
