@@ -5,7 +5,7 @@ using Zenject;
 
 public class CameraZoomController : IDisposable
 {
-    private CinemachineFreeLook _camera;
+    private CinemachineVirtualCamera _camera;
     private IZoomInputProvider _input;
 
     private float _zoomSpeed;
@@ -13,7 +13,7 @@ public class CameraZoomController : IDisposable
     private float _maxZoom;
 
     [Inject]
-    public CameraZoomController(CinemachineFreeLook camera, IZoomInputProvider input, float zoomSpeed, float minZoom, float maxZoom)
+    public CameraZoomController(CinemachineVirtualCamera camera, IZoomInputProvider input, float zoomSpeed, float minZoom, float maxZoom)
     {
         _camera = camera;
         _input = input;
