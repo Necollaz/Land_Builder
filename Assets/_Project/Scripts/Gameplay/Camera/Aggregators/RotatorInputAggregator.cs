@@ -1,7 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 
 public class RotatorInputAggregator : IRotatorInputProvider
 {
@@ -11,7 +8,9 @@ public class RotatorInputAggregator : IRotatorInputProvider
     {
         foreach (var p in providers)
         {
-            if (p == null) continue;
+            if (p == null) 
+                continue;
+            
             p.OnRotatorInput += d => OnRotatorInput?.Invoke(d);
         }
     }

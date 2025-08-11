@@ -5,25 +5,21 @@ using Zenject;
 
 public class CameraRotatorController : IDisposable
 {
-    private CinemachineFreeLook _camera;
     private IRotatorInputProvider _input;
+    private Transform _cameraTarget;
 
     [Inject]
-    public CameraRotatorController(CinemachineFreeLook camera, IRotatorInputProvider input)
+    public CameraRotatorController(Transform cameraTarget, IRotatorInputProvider input)
     {
-        _camera = camera;
         _input = input;
-        
-        _camera.m_XAxis.m_InputAxisValue = 0f;
+        _cameraTarget = cameraTarget;
 
         _input.OnRotatorInput += ApplyOrbit;
-        Debug.Log("Camera Rotator Controller");
     }
 
     private void ApplyOrbit(float deltaDegrees)
     {
-        _camera.m_XAxis.Value += deltaDegrees;
-        Debug.Log("22222");
+        _cameraTarget.Rotate(deltaDegrees * Vector3.up * Time.deltaTime);
     }
 
     public void Dispose()
