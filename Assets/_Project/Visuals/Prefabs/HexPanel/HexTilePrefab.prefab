@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 921951654194235605}
   - component: {fileID: 839639497855766900}
   - component: {fileID: 7960528188044281167}
+  - component: {fileID: -3010861937851673823}
   m_Layer: 0
   m_Name: HexTilePrefab
   m_TagString: Untagged
@@ -83,3 +84,15 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &-3010861937851673823
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9136858816657127363}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0bbac341b13b5b4ab38b47d220b8f5d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "939690018641",
+    "project_id": "landbuilder-9c18e",
+    "storage_bucket": "landbuilder-9c18e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:939690018641:android:789f680084d8cff64b3570",
+        "android_client_info": {
+          "package_name": "com.UnityTechnologies.com.unity.template.urpblank"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBH_wk6fCGkeF2hVjz7F62LDxntzwJiKp4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
