@@ -8,10 +8,10 @@ public class TileSpawnController : ITickable
     private readonly TileRotateController tileRotateController;
     private readonly HexTileGridBuilder tileGridBuilder;
     private readonly CameraController cameraController;
+    private readonly HexDirection hexDirection = new ();
     
     private HexGridController _hexGridController;
     private Dictionary<Vector2Int, HexCellView> _cellViewMap;
-
     private bool _isReady;
     
     public TileSpawnController(TilePreviewController tilePreviewController, TileRotateController tileRotateController, HexTileGridBuilder gridBuilder, CameraController cameraController)
@@ -64,8 +64,33 @@ public class TileSpawnController : ITickable
         {
             if (tilePreviewController.CurrentPreviewCoordinates == pickedCoordinates)
             {
+                var currentTile = tilePreviewController.CurrentPreviewInstance;
+
+                int dirIndex = 0;
+                
+                foreach (var neighborCoords in hexDirection.GetNeighbors(pickedCoordinates))
+                {
+                    if (!_hexGridController.TryGetTileAt(neighborCoords, out Hexagon neighborTile))
+                    {
+                        dirIndex++;
+                        continue;
+                    }
+
+                    int oppositeDir = (dirIndex + 3) % 6;
+
+                    var currentType = currentTile.GetEdgeType(dirIndex);
+                    var neighborType = neighborTile.GetEdgeType(oppositeDir);
+
+                    if (currentType == neighborType)
+                        Debug.Log($"Грань {dirIndex} совпала с соседом {neighborCoords}: {currentType}");
+                    else
+                        Debug.Log($"Грань {dirIndex} ({currentType}) не совпала с гранью соседа ({neighborType})");
+            
+                    dirIndex++;
+                }
+                
                 tileGridBuilder.Build(pickedCoordinates);
-                _hexGridController.PlaceTileAt(pickedCoordinates);
+                _hexGridController.PlaceTileAt(pickedCoordinates, currentTile);
                 tilePreviewController.AcceptPreview();
                 tileGridBuilder.RemoveCell(pickedCoordinates);
                 _hexGridController.ShowFrontier();

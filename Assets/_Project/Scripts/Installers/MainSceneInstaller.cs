@@ -7,7 +7,7 @@ using Zenject;
 public class MainSceneInstaller : MonoInstaller
 {
     [Header("Tile Grid Settings")]
-    [SerializeField] private GameObject _tilePrefab;
+    [SerializeField] private Hexagon _tilePrefab;
     [SerializeField] private GameObject _cellPrefab;
     [SerializeField] private Transform _containerTilePrefabs;
     
