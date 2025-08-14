@@ -3,16 +3,16 @@ using Object = UnityEngine.Object;
 
 public class TilePreviewController
 {
-    private readonly GameObject tilePrefab;
+    private readonly Hexagon tilePrefab;
     private readonly Transform container;
     
-    private GameObject _previewInstance;
+    private Hexagon _previewInstance;
     private Vector2Int? _previewCoordinates;
 
-    public GameObject CurrentPreviewInstance => _previewInstance;
+    public Hexagon CurrentPreviewInstance => _previewInstance;
     public Vector2Int? CurrentPreviewCoordinates => _previewCoordinates;
     
-    public TilePreviewController(GameObject tilePrefab, Transform container)
+    public TilePreviewController(Hexagon tilePrefab, Transform container)
     {
         this.tilePrefab = tilePrefab;
         this.container = container;

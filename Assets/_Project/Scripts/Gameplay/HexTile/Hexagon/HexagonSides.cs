@@ -6,4 +6,5 @@ public enum HexagonSides
     FourthSide = 3,
     FifthSide = 4,
     SixthSide = 5,
+    SeventhSide = 6,
 }
