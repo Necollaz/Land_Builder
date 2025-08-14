@@ -5,7 +5,7 @@ public class TileRotateController
     private const float ROTATION_STEP_ANGLE = 60f;
     private const float FULL_CIRCLE_ANGLE = 360f;
         
-    public void HandleRotation(GameObject tile)
+    public void HandleRotation(Hexagon tile)
     {
         if (tile == null)
             return;
@@ -24,7 +24,7 @@ public class TileRotateController
             Rotate(tile, ROTATION_STEP_ANGLE);
     }
         
-    private void Rotate(GameObject tile, float angleDelta)
+    private void Rotate(Hexagon tile, float angleDelta)
     {
         Vector3 angles = tile.transform.eulerAngles;
             

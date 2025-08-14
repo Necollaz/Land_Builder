@@ -4,6 +4,7 @@ using UnityEngine;
 public class HexGridController
 {
     private readonly Dictionary<Vector2Int, HexCellView> cellViewMap;
+    private readonly Dictionary<Vector2Int, Hexagon> placedTiles = new();
     private readonly HexDirection hexDirection;
 
     private HashSet<Vector2Int> _placedCoordinates = new();
@@ -27,11 +28,18 @@ public class HexGridController
 
         RefreshView();
     }
+    
+    public bool TryGetTileAt(Vector2Int coords, out Hexagon hex)
+    {
+        return placedTiles.TryGetValue(coords, out hex);
+    }
 
-    public void PlaceTileAt(Vector2Int targetCoordinates)
+    public void PlaceTileAt(Vector2Int targetCoordinates, Hexagon hex)
     {
         if (_placedCoordinates.Contains(targetCoordinates))
             return;
+        
+        placedTiles[targetCoordinates] = hex;
 
         _placedCoordinates.Add(targetCoordinates);
         _activatedCoordinates.Remove(targetCoordinates);
@@ -44,6 +52,7 @@ public class HexGridController
 
         RefreshView();
     }
+
 
     private void RefreshView()
     {
