@@ -13,8 +13,8 @@ GameObject:
   - component: {fileID: 5444960740911034639}
   - component: {fileID: 2997589954680816115}
   - component: {fileID: 74657477308664834}
-  m_Layer: 0
-  m_Name: Hex
+  m_Layer: 6
+  m_Name: HexTileForDeck
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
