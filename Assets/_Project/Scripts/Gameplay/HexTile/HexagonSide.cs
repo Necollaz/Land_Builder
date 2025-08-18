@@ -1,4 +1,4 @@
-public enum HexagonSides
+public enum HexagonSide
 {
     FirstSide = 0,
     SecondSide = 1,

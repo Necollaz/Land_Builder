@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e295e023e8a84b489a61ca5fb00bdc18, type: 3}
+  m_Name: CameraSettingsConfig
+  m_EditorClassIdentifier: 
+  <IgnoreWhenOverUI>k__BackingField: 1
+  <PanMultiplierWorld>k__BackingField: 1
+  <PanSmoothSeconds>k__BackingField: 0.08
+  <MaxPanUnitsPerSecond>k__BackingField: 100
+  <MinX>k__BackingField: -50
+  <MaxX>k__BackingField: 50
+  <MinZ>k__BackingField: -50
+  <MaxZ>k__BackingField: 50
+  <ZoomSpeed>k__BackingField: 1
+  <MinZoom>k__BackingField: 3
+  <MaxZoom>k__BackingField: 20
+  <ScalePanByZoom>k__BackingField: 1
+  <ScaleRotateByZoom>k__BackingField: 0
+  <ReferenceOrthoSize>k__BackingField: 10
+  <DesktopPanSensitivity>k__BackingField: 1
+  <DesktopPanInvert>k__BackingField: 0
+  <DesktopRotateSensitivity>k__BackingField: 20
+  <DesktopWheelZoomSensitivity>k__BackingField: 1
+  <MobilePanSensitivity>k__BackingField: 0.7
+  <MobilePanInvert>k__BackingField: 0
+  <MobileRotateSensitivity>k__BackingField: 2
+  <MobilePinchZoomSensitivity>k__BackingField: 0.1

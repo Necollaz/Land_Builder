@@ -5,9 +5,11 @@ public class HexDeckModel
 {
     private readonly Queue<HexTileData> queue = new Queue<HexTileData>();
     private readonly Random random;
+    
     private readonly int maxSize;
     private readonly int refillBatch;
     private readonly int distinctTypesAllowed;
+    
     private readonly float continueSameChance;
 
     public HexDeckModel(int maxSize, int refillBatch, int distinctTypesAllowed, float continueSameChance, Random random)
@@ -22,25 +24,6 @@ public class HexDeckModel
     }
     
     public int Count => queue.Count;
-    
-    public HexTileData PeekTop() => queue.Count > 0 ? queue.Peek() : null;
-
-    public HexTileData[] PeekTopRange(int count)
-    {
-        count = Math.Max(0, count);
-        HexTileData[] result = new HexTileData[Math.Min(count, queue.Count)];
-        int index = 0;
-
-        foreach (HexTileData item in queue)
-        {
-            if(index >= result.Length)
-                break;
-            
-            result[index++] = item;
-        }
-        
-        return result;
-    }
 
     public HexTileData Draw()
     {

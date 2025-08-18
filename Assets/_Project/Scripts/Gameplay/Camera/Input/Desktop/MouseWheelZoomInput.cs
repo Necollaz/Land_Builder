@@ -4,20 +4,20 @@ using Zenject;
 
 public class MouseWheelZoomInput : ITickable, IZoomInputProvider
 {
-    private float _zoomSensitivity;
+    public event Action<float> ZoomInputed;
     
-    public event Action<float> OnZoomInput;
+    private readonly float zoomSensitivity;
 
     public MouseWheelZoomInput(float zoomSensitivity)
     {
-        _zoomSensitivity = zoomSensitivity;
+        this.zoomSensitivity = zoomSensitivity;
     }
     
-    public void Tick()
+    void ITickable.Tick()
     {
         float wheel = Input.mouseScrollDelta.y;
         
         if (Mathf.Abs(wheel) > 0f)
-            OnZoomInput?.Invoke(wheel * _zoomSensitivity);
+            ZoomInputed?.Invoke(wheel * zoomSensitivity);
     }
 }
