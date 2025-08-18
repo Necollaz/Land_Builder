@@ -3,5 +3,5 @@ using UnityEngine;
 
 public interface ICameraMoverInputProvider
 {
-    public event Action<Vector2> OnPanInput;
+    public event Action<Vector2> PanInputed;
 }

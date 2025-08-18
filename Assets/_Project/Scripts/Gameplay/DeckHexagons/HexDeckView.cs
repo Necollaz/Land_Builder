@@ -3,89 +3,106 @@ using UnityEngine;
 
 public class HexDeckView
 {
-    private readonly Transform _deckRoot;
-    private readonly GameObjectPool<HexTileView> _pool;
+    private readonly Transform deckRoot;
+    private readonly GameObjectPool<HexTileView> pool;
 
-    private readonly List<HexTileView> _visuals = new List<HexTileView>();
+    private readonly List<HexTileView> visuals = new List<HexTileView>();
 
-    private readonly Vector3 _baseLocalOffset;
-    private readonly Vector3 _stackDirectionLocal;
-    private readonly Vector3 _hiddenTilesLocalScale;
-    private readonly Vector3 _topTilesLocalScale;
-    private readonly Quaternion _tilesLocalRotation;
+    private Vector3 baseLocalOffset;
+    private Vector3 stackDirectionLocal;
+    private Vector3 hiddenTilesLocalScale;
+    private Vector3 topTilesLocalScale;
+    private Quaternion tilesLocalRotation;
 
-    private readonly int _visibleTopCount;
-    private readonly float _packedStep;
-    private readonly float _visibleStep;
+    private int visibleBelowTopCount;
+    
+    private float packedStep;
+    private float top1ExtraStep;
+    private float top2ExtraStep;
+    private float top3ExtraStep;
 
     public HexDeckView(Transform deckRoot, GameObjectPool<HexTileView> pool, Vector3 baseLocalOffset, Vector3 stackDirectionLocal, Vector3 hiddenTilesLocalScale,
-        Vector3 topTilesLocalScale, Quaternion tilesLocalRotation, float packedStep, float visibleStep, int visibleTopCount)
+        Vector3 topTilesLocalScale, Quaternion tilesLocalRotation, float packedStep, float top1ExtraStep, float top2ExtraStep, float top3ExtraStep, int visibleBelowTopCount)
     {
-        _deckRoot = deckRoot;
-        _pool = pool;
-        _baseLocalOffset = baseLocalOffset;
-        _stackDirectionLocal = stackDirectionLocal.normalized;
-        _hiddenTilesLocalScale = hiddenTilesLocalScale;
-        _topTilesLocalScale = topTilesLocalScale;
-        _tilesLocalRotation = tilesLocalRotation;
-        _packedStep = Mathf.Max(0f, packedStep);
-        _visibleStep = Mathf.Max(0f, visibleStep);
-        _visibleTopCount = Mathf.Max(0, visibleTopCount);
+        this.deckRoot = deckRoot;
+        this.pool = pool;
+        this.baseLocalOffset = baseLocalOffset;
+        this.stackDirectionLocal = stackDirectionLocal.normalized;
+        this.hiddenTilesLocalScale = hiddenTilesLocalScale;
+        this.topTilesLocalScale = topTilesLocalScale;
+        this.tilesLocalRotation = tilesLocalRotation;
+
+        this.packedStep = Mathf.Max(0f, packedStep);
+        this.top1ExtraStep = Mathf.Max(0f, top1ExtraStep);
+        this.top2ExtraStep = Mathf.Max(0f, top2ExtraStep);
+        this.top3ExtraStep = Mathf.Max(0f, top3ExtraStep);
+        this.visibleBelowTopCount = Mathf.Max(0, visibleBelowTopCount);
     }
 
+    public void ShiftAfterDraw(int totalCount) => ApplyLayout(totalCount);
+    
     public void RebuildVisuals(int totalCount, int ensureVisualsCount)
     {
-        int want = Mathf.Max(ensureVisualsCount, Mathf.Min(totalCount, _visibleTopCount + 1));
+        int topCount = Mathf.Min(3, totalCount);
+        int startIndex = Mathf.Max(0, totalCount - (topCount + visibleBelowTopCount));
+        int needVisuals = totalCount - startIndex;
+        int want = Mathf.Max(needVisuals, ensureVisualsCount);
 
-        while (_visuals.Count < want)
-            _visuals.Add(_pool.Take());
+        while (visuals.Count < want)
+            visuals.Add(pool.Take());
 
-        while (_visuals.Count > want)
+        while (visuals.Count > want)
         {
-            HexTileView last = _visuals[_visuals.Count - 1];
+            HexTileView last = visuals[visuals.Count - 1];
             
-            _visuals.RemoveAt(_visuals.Count - 1);
-            _pool.Return(last);
+            visuals.RemoveAt(visuals.Count - 1);
+            pool.Return(last);
         }
 
         ApplyLayout(totalCount);
     }
 
-    public void ShiftAfterDraw(int totalCount)
-    {
-        ApplyLayout(totalCount);
-    }
-
     private void ApplyLayout(int totalCount)
     {
-        int hiddenCount = Mathf.Max(0, totalCount - _visibleTopCount);
+        int topCount = Mathf.Min(3, totalCount);
+        int startIndex = Mathf.Max(0, totalCount - (topCount + visibleBelowTopCount));
+        int visualSlots = Mathf.Min(visuals.Count, totalCount - startIndex);
 
-        for (int i = 0; i < _visuals.Count; i++)
+        for (int i = 0; i < visualSlots; i++)
         {
-            HexTileView view = _visuals[i];
-            Transform viewTransform = view.transform;
+            int sourceIndex = startIndex + i;
+            Transform hexTransform = visuals[i].transform;
+            
+            hexTransform.SetParent(deckRoot, false);
+            hexTransform.localRotation = tilesLocalRotation;
 
-            viewTransform.SetParent(_deckRoot, false);
-            viewTransform.localRotation = _tilesLocalRotation;
+            float extra = 0f;
+            
+            if (totalCount >= 1 && sourceIndex == totalCount - 1)
+                extra = top1ExtraStep;
+            else if (totalCount >= 2 && sourceIndex == totalCount - 2)
+                extra = top2ExtraStep;
+            else if (totalCount >= 3 && sourceIndex == totalCount - 3)
+                extra = top3ExtraStep;
 
-            bool isHiddenLayer = i == 0;
+            Vector3 localPosition = baseLocalOffset + stackDirectionLocal * (packedStep * sourceIndex + extra);
+            hexTransform.localPosition = localPosition;
 
-            if (isHiddenLayer)
-            {
-                viewTransform.localScale = _hiddenTilesLocalScale;
-                Vector3 position = _baseLocalOffset + _stackDirectionLocal * (_packedStep * hiddenCount);
-                viewTransform.localPosition = position;
-            }
-            else
-            {
-                int visibleIndexFromBottom = i - 1;
-                float basePackedHeight = _packedStep * hiddenCount;
-                float addVisibleHeight = _visibleStep * visibleIndexFromBottom;
-                Vector3 position = _baseLocalOffset + _stackDirectionLocal * (basePackedHeight + addVisibleHeight);
+            bool isTop3 = (totalCount >= 1 && sourceIndex == totalCount - 1) || (totalCount >= 2 && sourceIndex == totalCount - 2) ||
+                          (totalCount >= 3 && sourceIndex == totalCount - 3);
 
-                viewTransform.localScale = _topTilesLocalScale;
-                viewTransform.localPosition = position;
-            }
+            hexTransform.localScale = isTop3 ? topTilesLocalScale : hiddenTilesLocalScale;
+        }
+        
+        for (int i = visualSlots; i < visuals.Count; i++)
+        {
+            visuals[i].gameObject.SetActive(false);
+        }
+        
+        for (int i = 0; i < visualSlots; i++)
+        {
+            if (!visuals[i].gameObject.activeSelf)
+                visuals[i].gameObject.SetActive(true);
         }
     }
 }

@@ -210,21 +210,10 @@ MonoBehaviour:
   _poolParent: {fileID: 1133825417}
   _mainCamera: {fileID: 519420031}
   _gridComponent: {fileID: 1154843680}
+  _cameraSettings: {fileID: 11400000, guid: 0a79c1d86170fec4b8a0cd30c8af8f7f, type: 2}
   _cinemachineVirtualCamera: {fileID: 2055960779}
   _camera: {fileID: 519420031}
   _cameraTarget: {fileID: 1301178142}
-  _zoomSensitivity: 0.2
-  _zoomSpeed: 3
-  _minZoom: 2
-  _maxZoom: 15
-  _rotarorSensitivity: 1500
-  _deadZone: 2
-  _panMultiplier: 1
-  _movementSensitivity: 1
-  _minX: -20
-  _maxX: 20
-  _minZ: -20
-  _maxZ: 20
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -303,7 +292,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.31622773, y: -6.5584876e-15, z: 4.258579e-15, w: 0.9486833}
+  m_LocalRotation: {x: 0.31622776, y: 0.000000028272964, z: -0.000000009424321, w: 0.9486833}
   m_LocalPosition: {x: 0, y: 7.5, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -924,7 +913,7 @@ Transform:
   m_GameObject: {fileID: 1924657395}
   serializedVersion: 2
   m_LocalRotation: {x: -0.31622776, y: -0.000000028272964, z: 0.000000009424321, w: 0.9486833}
-  m_LocalPosition: {x: -19.24, y: 0, z: 12.499999}
+  m_LocalPosition: {x: -30, y: -0, z: 12.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1059,7 +1048,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2055960777}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.31622773, y: -6.5584876e-15, z: 4.258579e-15, w: 0.9486833}
+  m_LocalRotation: {x: 0.31622776, y: 0.000000028272964, z: -0.000000009424321, w: 0.9486833}
   m_LocalPosition: {x: 0, y: 7.5, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0

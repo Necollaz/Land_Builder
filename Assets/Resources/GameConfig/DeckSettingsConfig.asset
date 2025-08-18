@@ -18,12 +18,14 @@ MonoBehaviour:
   <DeckRefillBatch>k__BackingField: 16
   <DistinctTypesAllowed>k__BackingField: 2
   <ContinueSameChance>k__BackingField: 0.6
-  <BaseLocalOffset>k__BackingField: {x: 0, y: 0, z: 0}
+  <BaseLocalOffset>k__BackingField: {x: 0, y: -9, z: 0}
   <StackDirectionLocal>k__BackingField: {x: 0, y: 1, z: 0}
-  <HiddenTilesLocalScale>k__BackingField: {x: 0.98, y: 0.98, z: 0.98}
-  <TopTilesLocalScale>k__BackingField: {x: 1, y: 1, z: 1}
+  <PackedStep>k__BackingField: 0.15
   <TilesLocalEuler>k__BackingField: {x: 0, y: 0, z: 0}
-  <VisibleTopCount>k__BackingField: 3
-  <PackedStep>k__BackingField: 0.01
-  <VisibleStep>k__BackingField: 0.12
+  <HiddenTilesLocalScale>k__BackingField: {x: 1, y: 1, z: 1}
+  <TopTilesLocalScale>k__BackingField: {x: 1, y: 1, z: 1}
+  <Top1ExtraStep>k__BackingField: 0.55
+  <Top2ExtraStep>k__BackingField: 0.35
+  <Top3ExtraStep>k__BackingField: 0.15
+  <VisibleBelowTopCount>k__BackingField: 3
   <PoolPreloadCount>k__BackingField: 32
