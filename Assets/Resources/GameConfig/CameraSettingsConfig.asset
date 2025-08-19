@@ -21,8 +21,8 @@ MonoBehaviour:
   <MinZ>k__BackingField: -50
   <MaxZ>k__BackingField: 50
   <ZoomSpeed>k__BackingField: 1
-  <MinZoom>k__BackingField: 3
-  <MaxZoom>k__BackingField: 20
+  <MinZoom>k__BackingField: 5
+  <MaxZoom>k__BackingField: 15
   <ScalePanByZoom>k__BackingField: 1
   <ScaleRotateByZoom>k__BackingField: 0
   <ReferenceOrthoSize>k__BackingField: 10
