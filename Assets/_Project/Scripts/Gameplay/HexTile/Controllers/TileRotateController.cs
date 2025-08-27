@@ -7,21 +7,19 @@ public class TileRotateController
         
     public void HandleRotation(Hexagon tile)
     {
-        if (tile == null)
-            return;
-        
+        if (tile == null) return;
+
+        int delta = 0;
+
         float scroll = Input.mouseScrollDelta.y;
-            
-        if (scroll > 0f)
-            Rotate(tile, ROTATION_STEP_ANGLE);
-        else if (scroll < 0f)
-            Rotate(tile, -ROTATION_STEP_ANGLE);
-        
-        if (Input.GetKeyDown(KeyCode.Q))
-            Rotate(tile, -ROTATION_STEP_ANGLE);
-            
-        if (Input.GetKeyDown(KeyCode.E))
-            Rotate(tile, ROTATION_STEP_ANGLE);
+        if (scroll > 0.1f) delta += 1;
+        else if (scroll < -0.1f) delta -= 1;
+
+        if (Input.GetKeyDown(KeyCode.Q)) delta -= 1;
+        if (Input.GetKeyDown(KeyCode.E)) delta += 1;
+
+        if (delta != 0)
+            tile.RotateSteps(delta);
     }
         
     private void Rotate(Hexagon tile, float angleDelta)

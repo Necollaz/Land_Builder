@@ -38,15 +38,17 @@ public class MainSceneInstaller : MonoInstaller
     [SerializeField] private float _minZ;
     [SerializeField] private float _maxZ;
 
+    [SerializeField] private HexagonPutter _hexagonPutter;
+    
     public override void InstallBindings()
     {
         var cameraController = Bind(new CameraController(_mainCamera));
         var hexDirection = Bind(new HexDirection());
         var gridBuilder = Bind(new HexTileGridBuilder(Container, _gridComponent, _cellPrefab, hexDirection));
-        var tilePreview = Bind(new TilePreviewController(_tilePrefab, _containerTilePrefabs));
         var tileRotator = Bind(new TileRotateController());
-        var tileSpawn = Bind(new TileSpawnController(tilePreview, tileRotator, gridBuilder, cameraController));
-        var hexInitializer = Bind(new HexGridInitializer(gridBuilder, tileSpawn, hexDirection));
+        var tilePreview = Bind(new TilePreviewController(_tilePrefab, _containerTilePrefabs, tileRotator));
+        var tileSpawn = Bind(new TileSpawnController(tilePreview));
+        var hexInitializer = Bind(new HexGridInitializer(gridBuilder, tileSpawn, hexDirection, _hexagonPutter));
         var mouseWheelRotarorInput = Bind(new MouseWheelRotarorInput(_rotarorSensitivity));
         var touchDragRotatorInput = Bind(new TouchDragRotatorInput(_rotarorSensitivity));
         var rotatorInputAggregator = Bind(new RotatorInputAggregator(mouseWheelRotarorInput, touchDragRotatorInput));
@@ -56,10 +58,12 @@ public class MainSceneInstaller : MonoInstaller
         var cameraTouchMover = Bind(new CameraTouchMover(_deadZone));
         var cameraMouseMover = Bind(new CameraMouseMover(_movementSensitivity));
         var moverAggregator = Bind(new CameraMoverInputAggregator(cameraMouseMover, cameraTouchMover));
-        
+
         Bind(new CameraMoverController(_cameraTarget, _camera, moverAggregator, _panMultiplier, _minX, _maxX, _minZ, _maxZ));
         Bind(new CameraZoomController(_cinemachineVirtualCamera, zoomAggregator, _zoomSpeed, _minZoom, _maxZoom));
         Bind(new CameraRotatorController(_cameraTarget, rotatorInputAggregator));
+
+        _hexagonPutter.Init(tileSpawn, tilePreview, gridBuilder, cameraController);
     }
 
     private T Bind<T>(T controller) where T : class
