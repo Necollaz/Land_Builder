@@ -3,7 +3,7 @@ using UnityEngine;
 [RequireComponent(typeof(Renderer))]
 public class HexRandomize : MonoBehaviour
 {
-    private static readonly int SeedID = Shader.PropertyToID("_Seed");
+    private readonly int SeedID = Shader.PropertyToID("_Seed");
     
     [SerializeField] private int _seedOverride = 0;
 
