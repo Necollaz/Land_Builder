@@ -8,6 +8,8 @@ public class MainSceneInstaller : MonoInstaller
     [SerializeField] private Hexagon _tilePrefab;
     [SerializeField] private GameObject _cellPrefab;
     [SerializeField] private Transform _containerTilePrefabs;
+
+    [SerializeField] private HexagonPutter _hexagonPutter;
     
     [Header("Deck Settings")]
     [SerializeField] private DeckSettingsConfig _deckSettings;
@@ -39,10 +41,10 @@ public class MainSceneInstaller : MonoInstaller
         var hexDirection = Bind(new HexDirection());
         var gridBuilder = Bind(new HexTileGridBuilder(Container, _gridComponent, _cellPrefab, hexDirection));
         
-        var tilePreview = Bind(new TilePreviewController(_tilePrefab, _containerTilePrefabs));
         var tileRotator = Bind(new TileRotateController());
-        var tileSpawn = Bind(new TileSpawnController(tilePreview, tileRotator, gridBuilder, cameraController));
-        var hexInitializer = Bind(new HexGridInitializer(gridBuilder, tileSpawn, hexDirection));
+        var tilePreview = Bind(new TilePreviewController(_tilePrefab, _containerTilePrefabs, tileRotator));
+        var tileSpawn = Bind(new TileSpawnController(tilePreview));
+        var hexInitializer = Bind(new HexGridInitializer(gridBuilder, tileSpawn, hexDirection, _hexagonPutter));
         
         var cameraTouchMover = Bind(new TouchDragPanInput(_cameraSettings.MobilePanSensitivity, _cameraSettings.MobilePanInvert, _cameraSettings.IgnoreWhenOverUI));
         var cameraMouseMover = Bind(new MouseDragPanInput(_cameraSettings.DesktopPanSensitivity, _cameraSettings.DesktopPanInvert, _cameraSettings.IgnoreWhenOverUI));
