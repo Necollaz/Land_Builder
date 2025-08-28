@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -88,12 +87,5 @@ public class Hexagon : MonoBehaviour
     {
         int localIndex = (sideInWorld - RotationSteps + 6) % 6;
         return _edgeTypes[localIndex];
-    }
-
-    public HexType GetEdgeTypeForNeighbor(Vector2Int thisCoords, Vector2Int neighborCoords)
-    {
-        int sideInWorld = HexSideHelper.GetSideIndex(thisCoords, neighborCoords);
-        if (sideInWorld < 0) return default;
-        return GetEdgeType(sideInWorld);
     }
 }
