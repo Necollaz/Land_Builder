@@ -8,7 +8,6 @@ public class MainSceneInstaller : MonoInstaller
     [SerializeField] private Hexagon _tilePrefab;
     [SerializeField] private GameObject _cellPrefab;
     [SerializeField] private Transform _containerTilePrefabs;
-
     [SerializeField] private HexagonPutter _hexagonPutter;
     
     [Header("Deck Settings")]
@@ -25,6 +24,9 @@ public class MainSceneInstaller : MonoInstaller
     [SerializeField] private CinemachineVirtualCamera _cinemachineVirtualCamera;
     [SerializeField] private Camera _camera;
     [SerializeField] private Transform _cameraTarget;
+    
+    [Header("UI")]
+    [SerializeField] private ScoreViewer _scoreViewer;
     
     public override void InstallBindings()
     {
@@ -60,10 +62,11 @@ public class MainSceneInstaller : MonoInstaller
 
         var mouseWheelZoomInput = Bind(new MouseWheelZoomInput(_cameraSettings.DesktopWheelZoomSensitivity));
         var zoomAggregator = Bind(new ZoomInputAggregator(mouseWheelZoomInput, touchTwoFinger));
-
+        var score = Bind(new Score());
+        
+        Bind(new ScoreGiver(score));
         Bind(new OrthoZoomWithCinemachine(_cinemachineVirtualCamera, zoomAggregator, _cameraSettings.ZoomSpeed, _cameraSettings.MinZoom, _cameraSettings.MaxZoom));
         Bind(new DeckPlacementListener(gridBuilder, deckController));
-        _hexagonPutter.Init(tileSpawn, tilePreview, gridBuilder, cameraController);
     }
 
     private T Bind<T>(T controller) where T : class

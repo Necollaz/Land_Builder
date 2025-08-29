@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 public class HexagonPutter : MonoBehaviour
 {
@@ -8,44 +9,53 @@ public class HexagonPutter : MonoBehaviour
     [SerializeField] private Button _agreeButton;
 
     private TilePreviewController _tilePreviewController;
+    private TileSpawnController _tileSpawnController;
     private HexTileGridBuilder _tileGridBuilder;
     private HexGridController _hexGridController;
     private CameraController _cameraController;
-
-    private bool _hasPending;
     private Vector2Int _pendingCoordinates;
     private HexCellView _pendingCell;
-
-    public void Init(
+    private ScoreGiver _scoreGiver;
+    private bool _hasPending;
+    
+    [Inject]
+    public void Construct(
         TileSpawnController tileSpawnController,
         TilePreviewController tilePreviewController,
         HexTileGridBuilder tileGridBuilder,
-        CameraController cameraController)
+        CameraController cameraController,
+        ScoreGiver scoreGiver)
     {
+        _tileSpawnController = tileSpawnController;
         _tilePreviewController = tilePreviewController;
         _tileGridBuilder = tileGridBuilder;
         _cameraController = cameraController;
-
-        tileSpawnController.OnTilePut += SetHexagon;
-        tileSpawnController.OnTileCanceled += SetActivePanelFalse;
+        _scoreGiver = scoreGiver;
     }
-
-    public void SetGridController(HexGridController hexGridController)
-    {
-        _hexGridController = hexGridController;
-    }
-
+    
     private void OnEnable()
     {
+        _tileSpawnController.OnTilePut += SetHexagon;
+        _tileSpawnController.OnTileCanceled += SetActivePanelFalse;
+        
         _agreeButton.onClick.AddListener(OnAgreeClicked);
         _cancelButton.onClick.AddListener(OnCancelClicked);
+        
         SetActivePanelFalse();
     }
 
     private void OnDisable()
     {
+        _tileSpawnController.OnTilePut -= SetHexagon;
+        _tileSpawnController.OnTileCanceled -= SetActivePanelFalse;
+        
         _agreeButton.onClick.RemoveListener(OnAgreeClicked);
         _cancelButton.onClick.RemoveListener(OnCancelClicked);
+    }
+    
+    public void SetGridController(HexGridController hexGridController)
+    {
+        _hexGridController = hexGridController;
     }
 
     private void SetHexagon(Vector2Int coordinates, HexCellView cell)
@@ -74,16 +84,16 @@ public class HexagonPutter : MonoBehaviour
             HexType newType  = candidate.GetEdgeType(sideNew);
             HexType existType = neighborHex.GetEdgeType(sideExist);
 
-            Debug.Log($"DEBUG NEIGH: {coords}->{neighborCoords} : dirNew={(neighborCoords-coords)} sideNew={sideNew} rotNew={candidate.RotationSteps} localNew={(sideNew - candidate.RotationSteps +6)%6} typeNew={newType} ; " +
-                      $"dirExist={(coords-neighborCoords)} sideExist={sideExist} rotExist={neighborHex.RotationSteps} localExist={(sideExist - neighborHex.RotationSteps +6)%6} typeExist={existType}" +
+            _scoreGiver.AddScore(newType, existType);
+            
+            Debug.Log($"DEBUG NEIGH: {coords}->{neighborCoords} : dirNew={(neighborCoords-coords)} sideNew={sideNew} rotNew={candidate.RotationSteps} " +
+                      $"localNew={(sideNew - candidate.RotationSteps +6)%6} typeNew={newType} ; " +
+                      $"dirExist={(coords-neighborCoords)} sideExist={sideExist} rotExist={neighborHex.RotationSteps} " +
+                      $"localExist={(sideExist - neighborHex.RotationSteps +6)%6} typeExist={existType}" +
                       $" Совпадает {newType == existType} ");
 
         }
     }
-
-
-
-
     
     private void OnAgreeClicked()
     {
@@ -120,7 +130,6 @@ public class HexagonPutter : MonoBehaviour
     }
 
     
-
     private void SetActivePanelTrue() => _hexPutterRect.gameObject.SetActive(true);
 
     private void SetActivePanelFalse()
