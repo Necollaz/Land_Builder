@@ -1,4 +1,6 @@
+using System;
 using TMPro;
+using UniRx;
 using UnityEngine;
 using Zenject;
 
@@ -6,6 +8,7 @@ public class ScoreViewer : MonoBehaviour
 {
    [SerializeField] private TextMeshProUGUI _textScore;
    
+   private CompositeDisposable _disposables = new ();
    private Score _score;
    
    [Inject]
@@ -14,19 +17,18 @@ public class ScoreViewer : MonoBehaviour
       _score = score;
    }
 
-   private void OnEnable()
-   {
-      _score.OnValueChange += Change;
-   }
-
    private void Start()
    {
-      _textScore.text = "Score: " + _score.Value;
+      _score.Value
+         .Subscribe(Change)
+         .AddTo(_disposables);
+      
+      Change(_score.Value.Value);
    }
 
-   private void OnDisable()
+   private void OnDestroy()
    {
-      _score.OnValueChange -= Change;
+      _disposables.Dispose();
    }
 
    private void Change(int value)

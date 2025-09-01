@@ -1,11 +1,11 @@
 using System;
+using UniRx;
 
 public class Score
 {
-    public event Action<int> OnValueEnd;
-    public event Action<int> OnValueChange;
+    public Subject<int> OnValueEnd = new ();
     
-    public int Value { get; private set; }
+    public ReactiveProperty<int> Value = new ();
 
     public int AdditionalValue { get; private set; } = 1;
     
@@ -15,12 +15,10 @@ public class Score
 
     public void AddValue()
     {
-        Value += AdditionalValue;
+        Value.Value += AdditionalValue;
         
-        OnValueChange?.Invoke(Value);
-        
-        if(Value >= ValueForWin)
-            OnValueEnd?.Invoke(Value);
+        if(Value.Value >= ValueForWin)
+            OnValueEnd?.OnNext(Value.Value);
     }
     
     public void ReduceValue(int value = 2) => AdditionalValue *= value;
