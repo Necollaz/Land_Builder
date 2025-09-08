@@ -67,6 +67,9 @@ public class MainSceneInstaller : MonoInstaller
         Bind(new ScoreGiver(score));
         Bind(new OrthoZoomWithCinemachine(_cinemachineVirtualCamera, zoomAggregator, _cameraSettings.ZoomSpeed, _cameraSettings.MinZoom, _cameraSettings.MaxZoom));
         Bind(new DeckPlacementListener(gridBuilder, deckController));
+        var progressService = Bind(new ProgressService());
+        var levelLoader = Bind(new LevelLoader(score, hexInitializer));
+        Bind(new LevelSelectionController(levelLoader, progressService));
     }
 
     private T Bind<T>(T controller) where T : class

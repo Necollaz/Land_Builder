@@ -1,24 +1,27 @@
 using Cysharp.Threading.Tasks;
-using UnityEngine;
-using Zenject;
 
-public class LevelSelectionController : MonoBehaviour
+public class LevelSelectionController
 {
-    [SerializeField] private LoadingScreen _loadingScreen;
+    private readonly ILevelLoader _levelLoader;
+    private readonly IProgressService _progress;
 
-    private ILevelManager _levelManager;
-
-    [Inject]
-    public void Construct(ILevelManager manager)
+    public LevelSelectionController(ILevelLoader loader, IProgressService progress)
     {
-        _levelManager = manager;
+        _levelLoader = loader;
+        _progress = progress;
     }
 
-    public async void SelectLevel(LevelConfig config)
+    public async UniTask SelectLevel(LevelConfig config)
     {
-        _loadingScreen.Show();
-        await _levelManager.UnloadLevel(this.GetCancellationTokenOnDestroy());
-        await _levelManager.LoadLevel(config, this.GetCancellationTokenOnDestroy());
-        _loadingScreen.Hide();
+        if (!_progress.IsLevelUnlocked(config.LevelId))
+            return;
+
+        await _levelLoader.LoadLevel(config);
+    }
+
+    public void CompleteLevel(LevelConfig config)
+    {
+        foreach (var next in config.NextLevels)
+            _progress.UnlockLevel(next.LevelId);
     }
 }

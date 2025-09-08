@@ -1,18 +1,23 @@
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-public class LoadingScreen : MonoBehaviour
+public static class LoadingScreen
 {
-    [SerializeField] private CanvasGroup _canvasGroup;
+    private static GameObject _view;
 
-    public void Show()
+    public static async UniTask Show()
     {
-        _canvasGroup.alpha = 1;
-        _canvasGroup.blocksRaycasts = true;
+        if (_view == null)
+            _view = Object.Instantiate(Resources.Load<GameObject>("LoadingScreen"));
+
+        _view.SetActive(true);
+
+        await UniTask.Yield();
     }
 
-    public void Hide()
+    public static async UniTask Hide()
     {
-        _canvasGroup.alpha = 0;
-        _canvasGroup.blocksRaycasts = false;
+        _view.SetActive(false);
+        await UniTask.Yield();
     }
 }
