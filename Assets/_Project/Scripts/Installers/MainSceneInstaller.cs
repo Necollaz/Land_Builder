@@ -4,22 +4,26 @@ using Zenject;
 
 public class MainSceneInstaller : MonoInstaller
 {
+    [Header("Configs")]
+    [SerializeField] private SettingsDefaultsConfig _settingsDefaults;
+    [SerializeField] private DeckSettingsConfig _deckSettings;
+    [SerializeField] private CameraSettingsConfig _cameraSettings;
+    [SerializeField] private SceneNamesData _sceneNamesData;
+    
+    [Header("Scene References")]
+    [SerializeField] private Camera _mainCamera;
+    [SerializeField] private Grid _gridComponent;
+    
     [Header("Tile Grid Settings")]
     [SerializeField] private Hexagon _tilePrefab;
     [SerializeField] private GameObject _cellPrefab;
     [SerializeField] private Transform _containerTilePrefabs;
     
     [Header("Deck Settings")]
-    [SerializeField] private DeckSettingsConfig _deckSettings;
     [SerializeField] private Transform _deckRoot;
     [SerializeField] private Transform _poolParent;
     
-    [Header("Scene References")]
-    [SerializeField] private Camera _mainCamera;
-    [SerializeField] private Grid _gridComponent;
-    
     [Header("Camera Settings")]
-    [SerializeField] private CameraSettingsConfig _cameraSettings;
     [SerializeField] private CinemachineVirtualCamera _cinemachineVirtualCamera;
     [SerializeField] private Camera _camera;
     [SerializeField] private Transform _cameraTarget;
@@ -61,11 +65,24 @@ public class MainSceneInstaller : MonoInstaller
 
         Bind(new OrthoZoomWithCinemachine(_cinemachineVirtualCamera, zoomAggregator, _cameraSettings.ZoomSpeed, _cameraSettings.MinZoom, _cameraSettings.MaxZoom));
         Bind(new DeckPlacementListener(gridBuilder, deckController));
+        
+        BindPlacementBudgetSubsystem(gridBuilder);
     }
+    
+    private void BindPlacementBudgetSubsystem(HexTileGridBuilder gridBuilder)
+    {
+        int startPlacements = Mathf.Max(1, _deckSettings.StartPlacements);
+        var budget = Bind(new PlacementBudgetModel(startPlacements));
 
+        Container.Bind<PlacementBudgetListener>().AsSingle().WithArguments(gridBuilder, budget);
+        Container.Unbind<IExtraTilesGranter>();
+        Container.Bind<IExtraTilesGranter>().To<ExtraTilesGranterFromBudget>().AsSingle().WithArguments(budget);
+    }
+    
     private T Bind<T>(T controller) where T : class
     {
         Container.BindInterfacesAndSelfTo<T>().FromInstance(controller).AsSingle();
+        
         return controller;
     }
 }

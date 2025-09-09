@@ -34,10 +34,10 @@ public class AsyncSceneLoader : MonoBehaviour
         
         while (Time.unscaledTime - startTime < _minShowTime)
             yield return null;
-        //
+        
         if (_extraHoldTime > 0f)
             yield return new WaitForSecondsRealtime(_extraHoldTime);
-        //
+        
         if (_allowActivationAfterMinTime)
             sceneAsync.allowSceneActivation = true;
     }
