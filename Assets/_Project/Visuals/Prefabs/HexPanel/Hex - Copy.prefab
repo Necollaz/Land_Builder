@@ -207,7 +207,7 @@ GameObject:
   - component: {fileID: 4494454068764534810}
   - component: {fileID: 1711470165231059853}
   m_Layer: 0
-  m_Name: Hex
+  m_Name: Hex - Copy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

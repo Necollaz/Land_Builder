@@ -1,7 +1,6 @@
-﻿Shader "CustomUIShaders/Spinner"
-{
-    Properties
-    {
+﻿Shader "UIShaders/Spinner" {
+
+    Properties {
         [Header(Spinner Bar)]
         _Radius ("Radius", Range(0, 1)) = 0.4
         _Width ("Width", Range(0, 1)) = 0.12
@@ -34,29 +33,23 @@
         _ColorMask ("Color Mask", Float) = 15
     }
 
-    SubShader
-    {
+    SubShader {
         Tags { "RenderType" = "Transparent" "Queue" = "Transparent" "PreviewType" = "Plane" }
-        
         Blend SrcAlpha OneMinusSrcAlpha
         ZWrite Off
-        ZTest Always
         Cull Off
         LOD 200
 
-        Stencil
-        {
+        Stencil {
             Ref [_Stencil]
             Comp [_StencilComp]
             Pass [_StencilOp] 
             ReadMask [_StencilReadMask]
             WriteMask [_StencilWriteMask]
         }
-        
         ColorMask [_ColorMask]
 
-        Pass
-        {
+        Pass {
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
@@ -64,8 +57,6 @@
             #include "UnityCG.cginc"
             #include "Utils/Rotation2D.cginc" 
 
-            float _UnscaledTime;
-            
             //PROPERTIES
             //Spinner bar
             float _Radius, _Width, _Sharpness;
@@ -83,51 +74,40 @@
             sampler2D _MainTex;
             float _TexAlpha;
 
-            struct appdata
-            {
+            struct appdata {
                 float4 vertex : POSITION;
                 float2 texcoord : TEXCOORD0;
             };
 
-            struct v2f
-            {
+            struct v2f {
                 float2 texcoord : TEXCOORD0;
                 float4 vertex : SV_POSITION;
             };
             
-            v2f vert (appdata v)
-            {
+            v2f vert (appdata v) {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.texcoord = v.texcoord;
-                
                 return o;
             }
 
-            fixed4 frag (v2f i) : SV_Target
-            {
+            fixed4 frag (v2f i) : SV_Target {
                 float2 uv = i.texcoord;
                 float2 center = float2(_CenterX, _CenterY);
                 fixed4 texCol = tex2D(_MainTex, uv);
                 texCol.a = _TexAlpha * texCol.a;
-                
                 float2 cuv = uv-center;
-                float uTime = (_UnscaledTime != 0.0 ? _UnscaledTime : _Time.y);
-                cuv = uvRotation(cuv, 4, _RotSpeed, _RotCounterClock, uTime, _Modifier1, _Modifier2, _Modifier3);
-                
+                cuv = uvRotation(cuv, 4, _RotSpeed, _RotCounterClock, _Time[1], _Modifier1, _Modifier2, _Modifier3);
                 float l = length(cuv);
                 float f = smoothstep(l-(.1/_Sharpness), l, _Radius+(_Width*.5));
                 f -= smoothstep(l, l+(.1/_Sharpness), _Radius-(_Width*.5));
-                
-                float t = mod(uTime*_RangeSpeed, TPI) - PI;
+                float t = mod(_Time[1]*_RangeSpeed, TPI) - PI;
                 float t1 = -PI;
                 float t2 = sin(t) * (PI - 3.0-_Amplitude);
                 float _a = atan2(cuv.y, cuv.x);
                 f = f * step(_a, t2) * (1.0-step(_a, t1));
-                
                 float3 col = float3(0.0, 0.0, 0.0);
                 col = lerp(col, _Color, f);
-                
                 return float4(col, f) * texCol; 
             }
             ENDCG

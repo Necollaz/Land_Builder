@@ -49,7 +49,7 @@ public class MainSceneInstaller : MonoInstaller
         
         var tileRotator = Bind(new TileRotateController());
         var tilePreview = Bind(new TilePreviewController(_tilePrefab, _containerTilePrefabs, tileRotator));
-        var tileSpawn = Bind(new TileSpawnController(tilePreview));
+        var tileSpawn = Bind(new TileSpawnController(tilePreview, _gridComponent));
         var hexInitializer = Bind(new HexGridInitializer(gridBuilder, tileSpawn, hexDirection, _hexagonPutter));
         
         var cameraTouchMover = Bind(new TouchDragPanInput(_cameraSettings.MobilePanSensitivity, _cameraSettings.MobilePanInvert, _cameraSettings.IgnoreWhenOverUI));
@@ -58,14 +58,14 @@ public class MainSceneInstaller : MonoInstaller
         
         Bind(new CameraPanWithLag(_cameraTarget, _camera, moverAggregator, _cinemachineVirtualCamera, _cameraSettings));
 
-        var mouseWheelRotatorInput = Bind(new MouseMiddleDragYawInput(_cameraSettings.DesktopRotateSensitivity));
+        var mouseChordedYawInput = Bind(new MouseChordedLRDragYawInput(_cameraSettings.DesktopRotateSensitivity, _cameraSettings.IgnoreWhenOverUI));
         var touchTwoFinger = Bind(new TouchTwistAndPinchGestureInput(_cameraSettings.MobileRotateSensitivity, _cameraSettings.MobilePinchZoomSensitivity, _cameraSettings.IgnoreWhenOverUI));
-        var rotatorInputAggregator = Bind(new RotateInputAggregator(mouseWheelRotatorInput, touchTwoFinger));
+        var rotatorInputAggregator = Bind(new RotateInputAggregator(mouseChordedYawInput, touchTwoFinger));
 
         Bind(new OrbitYawAroundTarget(_cameraTarget, rotatorInputAggregator,  _cinemachineVirtualCamera, _cameraSettings));
 
-        var mouseWheelZoomInput = Bind(new MouseWheelZoomInput(_cameraSettings.DesktopWheelZoomSensitivity));
-        var zoomAggregator = Bind(new ZoomInputAggregator(mouseWheelZoomInput, touchTwoFinger));
+        var mouseDragZoomInput = Bind(new MouseHoldDragZoomInput(_cameraSettings.DesktopWheelZoomSensitivity, _cameraSettings.IgnoreWhenOverUI));
+        var zoomAggregator = Bind(new ZoomInputAggregator(mouseDragZoomInput, touchTwoFinger));
         var score = Bind(new Score());
         
         Bind(new ScoreGiver(score));

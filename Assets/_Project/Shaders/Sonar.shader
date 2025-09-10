@@ -1,4 +1,4 @@
-﻿Shader "CustomUIShaders/Sonar"
+﻿Shader "UIShaders/Sonar"
 {
     Properties
     {
@@ -53,7 +53,6 @@
     {
         Tags { "RenderType" = "Transparent" "Queue" = "Transparent" "PreviewType" = "Plane" }
         Blend SrcAlpha OneMinusSrcAlpha
-        ZTest Always
         Cull Off
         LOD 100
 

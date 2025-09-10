@@ -3,24 +3,23 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using Zenject;
 
-public class MouseDragPanInput : ICameraMoverInputProvider, ITickable
+public class MouseHoldDragZoomInput : ITickable, IZoomInputProvider
 {
-    public event Action<Vector2> PanInputed;
+    public event Action<float> ZoomInputed;
     
-    private readonly int mouseButton;
-    private readonly float effectiveSensitivity;
+    private readonly int mouseButton = 0;
+    private readonly float sensitivity;
     private readonly bool ignoreWhenOverUI;
-    
+
     private Vector2 _lastPosition;
     private bool _isDragging;
 
-    public MouseDragPanInput(float sensitivity, bool invert = false, bool ignoreWhenOverUI = true, int mouseButton = 1)
+    public MouseHoldDragZoomInput(float sensitivity, bool ignoreWhenOverUI = true)
     {
-        this.mouseButton = mouseButton;
+        this.sensitivity = sensitivity;
         this.ignoreWhenOverUI = ignoreWhenOverUI;
-        effectiveSensitivity = invert ? -Mathf.Abs(sensitivity) : Mathf.Abs(sensitivity);
     }
-
+    
     void ITickable.Tick()
     {
         if (ignoreWhenOverUI && EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
@@ -34,7 +33,7 @@ public class MouseDragPanInput : ICameraMoverInputProvider, ITickable
             
             return;
         }
-
+        
         if (Input.GetMouseButtonDown(mouseButton))
         {
             _isDragging = true;
@@ -47,13 +46,11 @@ public class MouseDragPanInput : ICameraMoverInputProvider, ITickable
         if (!_isDragging)
             return;
 
-        Vector2 currentPosition = Input.mousePosition;
-        Vector2 deltaPixels = currentPosition - _lastPosition;
-        Vector2 delta = deltaPixels * effectiveSensitivity;
+        Vector2 current = Input.mousePosition;
+        Vector2 delta = current - _lastPosition;
+        _lastPosition = current;
 
-        _lastPosition = currentPosition;
-
-        if (delta != Vector2.zero)
-            PanInputed?.Invoke(delta);
+        if (Mathf.Abs(delta.y) > Mathf.Epsilon)
+            ZoomInputed?.Invoke(delta.y * sensitivity);
     }
 }

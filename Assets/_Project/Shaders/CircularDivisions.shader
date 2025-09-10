@@ -1,7 +1,6 @@
-﻿Shader "CustomUIShaders/CircularDivisions"
-{
-    Properties
-    {
+﻿Shader "UIShaders/CircularDivisions" {
+
+    Properties {
         [Header(Bar parameters)]
         _Radius ("Radius", Range(0, 1)) = 0.4
         _Width ("Width", Range(0, 1)) = 0.12
@@ -36,29 +35,23 @@
         _ColorMask ("Color Mask", Float) = 15
     }
 
-    SubShader
-    {
+    SubShader {
         Tags { "RenderType" = "Background" "Queue" = "Transparent" "PreviewType" = "Plane" }
-        
         ZWrite Off
-        ZTest Always
         Blend SrcAlpha OneMinusSrcAlpha
         Cull Off
         LOD 200
 
-        Stencil
-        {
+        Stencil {
             Ref [_Stencil]
             Comp [_StencilComp]
             Pass [_StencilOp] 
             ReadMask [_StencilReadMask]
             WriteMask [_StencilWriteMask]
         }
-        
         ColorMask [_ColorMask]
 
-        Pass
-        {
+        Pass  {
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
@@ -67,8 +60,6 @@
             #include "Utils/Rotation2D.cginc"
             #include "Utils/Circles.cginc"
 
-            float _UnscaledTime;
-            
             //PROPERTIES
             //Bar
             float _Radius, _Width, _Sharpness, _Speed;
@@ -85,37 +76,32 @@
             sampler2D _MainTex;
             float _TexAlpha;
 
-            struct appdata_t
-            {
+            struct appdata_t {
                 float4 vertex : POSITION;
                 float2 texcoord : TEXCOORD0;
             };
 
-            struct v2f
-            {
+            struct v2f {
                 float4 vertex : SV_POSITION;
                 half2 texcoord : TEXCOORD0;
             };
 
-            v2f vert (appdata_t v)
-            {
+            v2f vert (appdata_t v) {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.texcoord = v.texcoord;
-                
                 return o;
             }
 
-            fixed4 frag (v2f i) : SV_Target
-            {
+            fixed4 frag (v2f i) : SV_Target {
+
                 float2 center = float2(_CenterX, _CenterY);
                 float2 uv = i.texcoord - center;
 
                 fixed4 texCol = tex2D(_MainTex, uv+center);
                 texCol.a = _TexAlpha * texCol.a;
 
-                float uTime = (_UnscaledTime != 0.0 ? _UnscaledTime : _Time.y);
-                uv = uvRotation(uv, _RotMode, _RotSpeed*_Rotating, _RotCounterClock, uTime, _Modifier1, _Modifier2, _Modifier3);
+                uv = uvRotation(uv, _RotMode, _RotSpeed*_Rotating, _RotCounterClock, _Time[1], _Modifier1, _Modifier2, _Modifier3);
                   
                 float angle = atan2(uv.y, uv.x);
                 fixed number = floor(_Divisions) * 1.0;
@@ -128,11 +114,9 @@
                 float zone = 0.0;
                 float angleRad = (angle / (PI/180.0) + 180.0);
                 float _step=(360.0/_Divisions);
-                float _offset = mod(floor(uTime*_Speed), number-0.001) * _step;
+                float _offset = mod(floor(_Time[1]*_Speed), number-0.001) * _step;
                 _offset = mod(_offset, 360.0);
-                
-                if(angleRad > _offset + 0.001 && angleRad < _offset + _step + 0.001)
-                    zone = 2.0;
+                if(angleRad > _offset + 0.001 && angleRad < _offset + _step + 0.001) zone = 2.0;
                 
                 _Color1 *= smoothstep(0.0, 1.0, intensity);
                 _Color2 *= smoothstep(0.0, 1.0, zone);

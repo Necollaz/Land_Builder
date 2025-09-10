@@ -1,9 +1,6 @@
-﻿Shader "CustomUIShaders/DottedCircle"
-{
-    Properties
-    {
-        [MainTexture] _MainTex("Texture", 2D) = "white" { }
-        
+﻿Shader "UIShaders/DottedCircle" {
+
+    Properties {
         [Header(Circle parameters)]
         _Angle("Angle", Range(0, 360)) = 360.0
         _Density("Density", Range(0, 50)) = 8.6
@@ -33,29 +30,23 @@
         _ColorMask ("Color Mask", Float) = 15
     }
 
-    SubShader
-    {
-        Tags { "RenderType" = "Background" "Queue" = "Transparent" "IgnoreProjector"="True" "PreviewType" = "Plane" "CanUseSpriteAtlas"="True" }
-        
+    SubShader {
+        Tags { "RenderType" = "Background" "Queue" = "Transparent" "PreviewType" = "Plane" }
         ZWrite Off
-        ZTest Always
         Blend SrcAlpha OneMinusSrcAlpha
         Cull Off
         LOD 200
 
-        Stencil
-        {
+        Stencil {
             Ref [_Stencil]
             Comp [_StencilComp]
             Pass [_StencilOp] 
             ReadMask [_StencilReadMask]
             WriteMask [_StencilWriteMask]
         }
-        
         ColorMask [_ColorMask]
 
-        Pass
-        {
+        Pass {
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
@@ -63,28 +54,20 @@
             #include "UnityCG.cginc"
             #include "Utils/Rotation2D.cginc"
 
-            sampler2D _MainTex;
-            float4 _MainTex_ST;
-            float _UnscaledTime;
-            
-            struct appdata_t
-            {
+            struct appdata_t {
                 float4 vertex : POSITION;
                 float2 texcoord : TEXCOORD0;
             };
 
-            struct v2f
-            {
+            struct v2f {
                 float4 vertex : SV_POSITION;
                 half2 texcoord : TEXCOORD0;
             };
 
-            v2f vert (appdata_t v)
-            {
+            v2f vert (appdata_t v) {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.texcoord = v.texcoord;
-                
                 return o;
             }
 
@@ -104,34 +87,21 @@
             float _RotCounterClock, _Rotating, _RotSpeed, _RotMode;
             float _Modifier1, _Modifier2, _Modifier3;
 
-            float alpha_circle(float2 texC)
-            {
-                float dist = atan2(texC.y, texC.x) * _Density;
+            float alpha_circle(float2 texC) {
+                float dist = atan(texC.y / texC.x) * _Density;
                 float init_sm = smoothstep(1.0, 0.0, frac(dist));
                 float final_sm = smoothstep(0, 1.0, frac(dist));
-
-                float ring = distance(length(texC.xy), _Radius);
-                float circle_mul = smoothstep(_Height + _Displacement, _Height - _Displacement, ring);
-                
-                float angle = atan2(texC.x, texC.y) / (2.0 * UNITY_PI);
-
-                if (angle < 0.0)
-                    angle = 1.0 + angle;
-                
-                float angleNorm = _Angle / 180.0;
-                float ratio_fact = smoothstep(1.0 - angleNorm, 1.0 - angleNorm, (angle - 0.5) * 2.0);
-
-                return saturate(ratio_fact * circle_mul * _AlphaMul * init_sm * final_sm);
+                float circle_mul = smoothstep(_Height + _Displacement, _Height - _Displacement, distance(distance(texC.xy, float2(0.0, 0.0)), _Radius));
+                float angle = atan2(texC.x, texC.y) / (2.0 * PI);
+                _Angle /= 180.0;
+                if (angle < 0.0) angle = 1.0 + angle;
+                float ratio_fact = smoothstep(1.0 - _Angle, 1.0 - _Angle, (angle - .5) * 2.0);
+                return ratio_fact * circle_mul * _AlphaMul * init_sm * final_sm;
             }
 
-            fixed4 frag (v2f i) : SV_Target
-            {
+            fixed4 frag (v2f i) : SV_Target {
                 float2 uv = i.texcoord - float2(.5, .5);
-                float uTime = (_UnscaledTime != 0.0 ? _UnscaledTime : _Time.y);
-                
-                if(_Rotating == 1)
-                    uv = uvRotation(uv, _RotMode, _RotSpeed, _RotCounterClock, uTime, _Modifier1, _Modifier2, _Modifier3);
-                
+                if(_Rotating == 1) uv = uvRotation(uv, _RotMode, _RotSpeed, _RotCounterClock, _Time[1], _Modifier1, _Modifier2, _Modifier3);
                 return float4(_Color.rgb, alpha_circle(uv)*_Color.a);
             }
             ENDCG

@@ -9,7 +9,6 @@ public class TilePreviewController
     private readonly Hexagon tilePrefab;
     private readonly Transform container;
     private readonly TileRotateController rotateController;
-   // private readonly CameraController cameraController;
 
     private Hexagon _previewInstance;
     private Vector2Int? _previewCoordinates;
@@ -19,18 +18,26 @@ public class TilePreviewController
     public Vector2Int? CurrentPreviewCoordinates => _previewCoordinates;
     public bool IsPreviewActive => _isPreviewActive;
 
-    public TilePreviewController(
-        Hexagon tilePrefab,
-        Transform container,
-        TileRotateController rotateController
-    )
+    public TilePreviewController(Hexagon tilePrefab, Transform container, TileRotateController rotateController)
     {
         this.tilePrefab = tilePrefab;
         this.container = container;
         this.rotateController = rotateController;
-       // this.cameraController = cameraController;
     }
 
+    public Hexagon CommitPreview()
+    {
+        if (_previewInstance == null)
+            return null;
+
+        Hexagon result = _previewInstance;
+        _previewInstance = null;
+        _previewCoordinates = null;
+        _isPreviewActive = false;
+
+        return result;
+    }
+    
     public void StartTilePreview(Vector2Int coordinates, Vector3 worldPosition)
     {
         CancelPreview();
@@ -40,16 +47,19 @@ public class TilePreviewController
 
         _isPreviewActive = true;
 
-        /*if (cameraController != null)
-            cameraController.enabled = false; //*/// или cameraController.SetInputEnabled(false);
-
         OnTilePut?.Invoke();
     }
 
     public void TickPreviewRotation()
     {
         if (_isPreviewActive && _previewInstance != null)
-            rotateController.HandleRotation(_previewInstance);
+            rotateController.TryRotation(_previewInstance);
+    }
+    
+    public void RotatePreviewStep(int delta)
+    {
+        if (_isPreviewActive && _previewInstance != null && delta != 0)
+            _previewInstance.RotateSteps(delta);
     }
 
     public void CancelPreview()
@@ -59,38 +69,13 @@ public class TilePreviewController
 
         _previewInstance = null;
         _previewCoordinates = null;
-
-        if (_isPreviewActive)
-        {
-            _isPreviewActive = false;
-            /*if (cameraController != null)
-                cameraController.enabled = true; // или cameraController.SetInputEnabled(true);*/
-        }
-    }
-
-    public Hexagon CommitPreview()
-    {
-        if (_previewInstance == null) return null;
-
-        Hexagon result = _previewInstance;
-        _previewInstance = null;
-        _previewCoordinates = null;
         _isPreviewActive = false;
-
-        return result;
     }
-
     
     public void AcceptPreview()
     {
         _previewCoordinates = null;
         _previewInstance = null;
-
-        if (_isPreviewActive)
-        {
-            _isPreviewActive = false;
-            /*if (cameraController != null)
-                cameraController.enabled = true; // или cameraController.SetInputEnabled(true);*/
-        }
+        _isPreviewActive = false;
     }
 }
