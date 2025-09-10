@@ -28,7 +28,7 @@ public class HexGridController
 
         RefreshView();
     }
-    
+
     public bool TryGetTileAt(Vector2Int coords, out Hexagon hex)
     {
         return placedTiles.TryGetValue(coords, out hex);

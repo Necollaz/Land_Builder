@@ -18,6 +18,7 @@ public class MainSceneInstaller : MonoInstaller
     [SerializeField] private Hexagon _tilePrefab;
     [SerializeField] private GameObject _cellPrefab;
     [SerializeField] private Transform _containerTilePrefabs;
+    [SerializeField] private HexagonPutter _hexagonPutter;
     
     [Header("Deck Settings")]
     [SerializeField] private Transform _deckRoot;
@@ -27,6 +28,9 @@ public class MainSceneInstaller : MonoInstaller
     [SerializeField] private CinemachineVirtualCamera _cinemachineVirtualCamera;
     [SerializeField] private Camera _camera;
     [SerializeField] private Transform _cameraTarget;
+    
+    [Header("UI")]
+    [SerializeField] private ScoreViewer _scoreViewer;
     
     public override void InstallBindings()
     {
@@ -43,10 +47,10 @@ public class MainSceneInstaller : MonoInstaller
         var hexDirection = Bind(new HexDirection());
         var gridBuilder = Bind(new HexTileGridBuilder(Container, _gridComponent, _cellPrefab, hexDirection));
         
-        var tilePreview = Bind(new TilePreviewController(_tilePrefab, _containerTilePrefabs));
         var tileRotator = Bind(new TileRotateController());
-        var tileSpawn = Bind(new TileSpawnController(tilePreview, tileRotator, gridBuilder, cameraController));
-        var hexInitializer = Bind(new HexGridInitializer(gridBuilder, tileSpawn, hexDirection));
+        var tilePreview = Bind(new TilePreviewController(_tilePrefab, _containerTilePrefabs, tileRotator));
+        var tileSpawn = Bind(new TileSpawnController(tilePreview));
+        var hexInitializer = Bind(new HexGridInitializer(gridBuilder, tileSpawn, hexDirection, _hexagonPutter));
         
         var cameraTouchMover = Bind(new TouchDragPanInput(_cameraSettings.MobilePanSensitivity, _cameraSettings.MobilePanInvert, _cameraSettings.IgnoreWhenOverUI));
         var cameraMouseMover = Bind(new MouseDragPanInput(_cameraSettings.DesktopPanSensitivity, _cameraSettings.DesktopPanInvert, _cameraSettings.IgnoreWhenOverUI));
@@ -62,9 +66,15 @@ public class MainSceneInstaller : MonoInstaller
 
         var mouseWheelZoomInput = Bind(new MouseWheelZoomInput(_cameraSettings.DesktopWheelZoomSensitivity));
         var zoomAggregator = Bind(new ZoomInputAggregator(mouseWheelZoomInput, touchTwoFinger));
-
+        var score = Bind(new Score());
+        
+        Bind(new ScoreGiver(score));
         Bind(new OrthoZoomWithCinemachine(_cinemachineVirtualCamera, zoomAggregator, _cameraSettings.ZoomSpeed, _cameraSettings.MinZoom, _cameraSettings.MaxZoom));
         Bind(new DeckPlacementListener(gridBuilder, deckController));
+        
+        var progressService = Bind(new ProgressService());
+        var levelLoader = Bind(new LevelLoader(score, hexInitializer));
+        Bind(new LevelSelectionController(levelLoader, progressService));
         
         BindPlacementBudgetSubsystem(gridBuilder);
     }
