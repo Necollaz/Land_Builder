@@ -5,6 +5,7 @@ using Zenject;
 public class HexTileGridBuilder
 {
     public delegate void OnTileBuild(Dictionary<Vector2Int, HexCellView> map, Vector2Int position);
+    
     public event OnTileBuild OnBuildCompleted;
     
     private readonly Grid grid;
@@ -26,7 +27,11 @@ public class HexTileGridBuilder
         this.cellPrefab = cellPrefab;
         this.hexDirection = hexDirection;
     }
+    
+    public Grid Grid => grid;
 
+    public IEnumerable<Vector2Int> GetNeighbors(Vector2Int coordinates) => hexDirection.GetNeighbors(coordinates);
+    
     public void Build(Vector2Int coordinates)
     {
         if (!_initialised)

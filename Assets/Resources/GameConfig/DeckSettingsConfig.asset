@@ -12,12 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a5a532cbf41404f9e560974cc29b352, type: 3}
   m_Name: DeckSettingsConfig
   m_EditorClassIdentifier: 
-  <TileViewPrefab>k__BackingField: {fileID: 74657477308664834, guid: b6769f686775ec140bfd08ee99981770,
+  _tileViewPrefab: {fileID: 74657477308664834, guid: b6769f686775ec140bfd08ee99981770,
     type: 3}
   <DeckMaxSize>k__BackingField: 64
   <DeckRefillBatch>k__BackingField: 16
   <DistinctTypesAllowed>k__BackingField: 2
   <ContinueSameChance>k__BackingField: 0.6
+  <StartPlacements>k__BackingField: 20
   <BaseLocalOffset>k__BackingField: {x: 0, y: -9, z: 0}
   <StackDirectionLocal>k__BackingField: {x: 0, y: 1, z: 0}
   <PackedStep>k__BackingField: 0.15

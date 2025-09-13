@@ -1,33 +1,43 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using Zenject;
 
 public class TileSpawnController : ITickable
 {
+    private const float MAX_CLICK_TIME_SECONDS = 0.25f;
+    private const float MAX_CLICK_MOVE_SQUARED = 8f * 8f;
+    
+    public event Action<Vector2Int, HexCellView> OnTilePut;
+    public event Action OnTileCanceled;
+    public event Action OnTileAcceptRequested;
+    public event Action OnTileCancelRequested;
+
     private readonly TilePreviewController tilePreviewController;
-    private readonly TileRotateController tileRotateController;
-    private readonly HexTileGridBuilder tileGridBuilder;
-    private readonly CameraController cameraController;
-    private readonly HexDirection hexDirection = new ();
+    private readonly Grid grid;
     
     private HexGridController _hexGridController;
     private Dictionary<Vector2Int, HexCellView> _cellViewMap;
-    private bool _isReady;
     
-    public TileSpawnController(TilePreviewController tilePreviewController, TileRotateController tileRotateController, HexTileGridBuilder gridBuilder, CameraController cameraController)
+    private Vector2 _mouseDownPosition;
+    private float _mouseDownTime;
+    private bool _pendingClick;
+    private bool _isReady;
+
+    public TileSpawnController(TilePreviewController tilePreviewController, Grid grid)
     {
         this.tilePreviewController = tilePreviewController;
-        this.tileRotateController = tileRotateController;
-        this.tileGridBuilder = gridBuilder;
-        this.cameraController = cameraController;
+        this.grid = grid;
     }
 
     public void Initialize(HexGridController hexGridController, Dictionary<Vector2Int, HexCellView> cellViewMap)
     {
         _hexGridController = hexGridController;
         _cellViewMap = cellViewMap;
+        
         _isReady = true;
-
+        
         _hexGridController.ShowSingleCellFrontier(new Vector2Int(0, 0));
     }
 
@@ -36,105 +46,99 @@ public class TileSpawnController : ITickable
         if (!_isReady)
             return;
 
-        tileRotateController.HandleRotation(tilePreviewController.CurrentPreviewInstance);
+        tilePreviewController.TickPreviewRotation();
 
-        if (!Input.GetMouseButtonDown(0))
-            return;
-
-        Camera mainCamera = CameraController.MainCamera;
-        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-        Plane groundPlane = new Plane(Vector3.up, 0f);
-
-        if (!groundPlane.Raycast(ray, out float enterDistance))
+        if (Input.GetMouseButtonDown(0))
         {
-            CancelOrResetPreview();
+            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+                return;
 
-            return;
+            _pendingClick = true;
+            _mouseDownTime = Time.unscaledTime;
+            _mouseDownPosition = Input.mousePosition;
         }
-
-        Vector3 worldPoint = ray.GetPoint(enterDistance);
         
-        if (!TryGetClosestCell(worldPoint, out Vector2Int pickedCoordinates) || !_hexGridController.IsCoordinateActive(pickedCoordinates))
+        if (_pendingClick)
         {
-            CancelOrResetPreview();
-            return;
-        }
-
-        if (tilePreviewController.CurrentPreviewInstance != null)
-        {
-            if (tilePreviewController.CurrentPreviewCoordinates == pickedCoordinates)
-            {
-                var currentTile = tilePreviewController.CurrentPreviewInstance;
-
-                int dirIndex = 0;
-                
-                foreach (var neighborCoords in hexDirection.GetNeighbors(pickedCoordinates))
-                {
-                    if (!_hexGridController.TryGetTileAt(neighborCoords, out Hexagon neighborTile))
-                    {
-                        dirIndex++;
-                        continue;
-                    }
-
-                    int oppositeDir = (dirIndex + 3) % 6;
-
-                    var currentType = currentTile.GetEdgeType(dirIndex);
-                    var neighborType = neighborTile.GetEdgeType(oppositeDir);
-
-                    if (currentType == neighborType)
-                        Debug.Log($"Грань {dirIndex} совпала с соседом {neighborCoords}: {currentType}");
-                    else
-                        Debug.Log($"Грань {dirIndex} ({currentType}) не совпала с гранью соседа ({neighborType})");
+            Vector2 delta = (Vector2)Input.mousePosition - _mouseDownPosition;
             
-                    dirIndex++;
-                }
+            if (delta.sqrMagnitude > MAX_CLICK_MOVE_SQUARED)
+                _pendingClick = false;
+        }
+        
+        if (Input.GetMouseButtonUp(0))
+        {
+            bool validClick = _pendingClick && (Time.unscaledTime - _mouseDownTime) <= MAX_CLICK_TIME_SECONDS;
+            _pendingClick = false;
+
+            if (!validClick)
+                return;
+
+            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+                return;
+            
+            Ray ray = CameraController.MainCamera.ScreenPointToRay(Input.mousePosition);
+            Plane gridPlane = new Plane(grid.transform.up, grid.transform.position);
+
+            if (!gridPlane.Raycast(ray, out float enter))
+            {
+                ClickWhenNoCellHit();
                 
-                tileGridBuilder.Build(pickedCoordinates);
-                _hexGridController.PlaceTileAt(pickedCoordinates, currentTile);
-                tilePreviewController.AcceptPreview();
-                tileGridBuilder.RemoveCell(pickedCoordinates);
-                _hexGridController.ShowFrontier();
+                return;
             }
-            else
+
+            Vector3 worldPoint = ray.GetPoint(enter);
+            Vector3Int cell = grid.WorldToCell(worldPoint);
+            Vector2Int coordinates = new Vector2Int(cell.x, cell.y);
+            
+            if (tilePreviewController.IsPreviewActive)
+            {
+                Vector2Int? previewCoords = tilePreviewController.CurrentPreviewCoordinates;
+                
+                if (!previewCoords.HasValue)
+                {
+                    ClickWhenNoCellHit();
+                    
+                    return;
+                }
+
+                if (coordinates == previewCoords.Value)
+                    OnTileAcceptRequested?.Invoke();
+                else
+                    OnTileCancelRequested?.Invoke();
+
+                return;
+            }
+            
+            if (!_cellViewMap.TryGetValue(coordinates, out HexCellView cellView) || !_hexGridController.IsCoordinateActive(coordinates))
             {
                 CancelOrResetPreview();
+                
+                return;
             }
+
+            cellView.SetVisible(false);
+            OnTilePut?.Invoke(coordinates, cellView);
         }
-        else
+    }
+    
+    private void ClickWhenNoCellHit()
+    {
+        if (tilePreviewController.IsPreviewActive)
         {
-            HexCellView cell = _cellViewMap[pickedCoordinates];
+            OnTileCancelRequested?.Invoke();
             
-            cell.SetVisible(false);
-            tilePreviewController.StartTilePreview(pickedCoordinates, cell.transform.position);
+            return;
         }
+
+        CancelOrResetPreview();
     }
 
     private void CancelOrResetPreview()
     {
         tilePreviewController.CancelPreview();
         _hexGridController.ShowFrontier();
-    }
-
-    private bool TryGetClosestCell(Vector3 worldPosition, out Vector2Int closest)
-    {
-        float minSquaredDistance = float.MaxValue;
-        Vector2Int bestMatch = default;
-        bool found = false;
-
-        foreach (var keyValuePair in _cellViewMap)
-        {
-            float squaredDistance = (worldPosition - keyValuePair.Value.transform.position).sqrMagnitude;
-
-            if (squaredDistance < minSquaredDistance)
-            {
-                minSquaredDistance = squaredDistance;
-                bestMatch = keyValuePair.Key;
-                found = true;
-            }
-        }
-
-        closest = bestMatch;
         
-        return found;
+        OnTileCanceled?.Invoke();
     }
 }
