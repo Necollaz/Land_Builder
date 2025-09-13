@@ -3,7 +3,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "DeckSettingsConfig", menuName = "Game/Configs/Deck Settings")]
 public class DeckSettingsConfig : ScriptableObject
 {
-    [field: SerializeField, Tooltip("Префаб визуала одной плитки колоды.")] public HexTileView TileViewPrefab { get; private set; }
+    [SerializeField, Tooltip("Префаб визуала одной плитки колоды.")] private HexTileView _tileViewPrefab;
 
     [field: Header("Model")]
     [field: SerializeField, Tooltip("Максимально допустимый размер колоды.")] public int DeckMaxSize { get; private set; } = 64;
@@ -30,4 +30,6 @@ public class DeckSettingsConfig : ScriptableObject
 
     [field: Header("Pool")]
     [field: SerializeField, Tooltip("Первичное количество предсозданных экземпляров визуала плитки в пуле.")] public int PoolPreloadCount { get; private set; } = 32;
+
+    public HexTileView TileViewPrefab => _tileViewPrefab;
 }

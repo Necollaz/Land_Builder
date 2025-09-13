@@ -10,48 +10,65 @@ public class MouseChordedLRDragYawInput : ITickable, IRotatorInputProvider
     
     public event Action<float> RotatorInputed;
 
-    private readonly float sensitivity;
+    private readonly CameraSettingsConfig settings;
+    private readonly float deadZoneUnits;
+    private readonly float smoothingLerp01;
+    private readonly float maxDegreesPerFrame;
     private readonly bool ignoreWhenOverUI;
 
-    private Vector2 _lastMousePosition;
-    private bool _isDragging;
+    private float _filteredAxisX;
+    private bool _chordActive;
 
-    public MouseChordedLRDragYawInput(float sensitivity, bool ignoreWhenOverUI = true)
+    public MouseChordedLRDragYawInput(CameraSettingsConfig settings, bool ignoreWhenOverUI = true, float deadZoneUnits = 0.0f,
+        float smoothingLerp01 = 0.35f, float maxDegreesPerFrame = 45f)
     {
-        this.sensitivity = sensitivity;
+        this.settings = settings;
         this.ignoreWhenOverUI = ignoreWhenOverUI;
+        this.deadZoneUnits = Mathf.Max(0f, deadZoneUnits);
+        this.smoothingLerp01 = Mathf.Clamp01(smoothingLerp01);
+        this.maxDegreesPerFrame = Mathf.Max(0f, maxDegreesPerFrame);
     }
 
     void ITickable.Tick()
     {
         if (ignoreWhenOverUI && EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+        {
+            _chordActive = false;
+            _filteredAxisX = 0f;
+            
             return;
+        }
 
         bool left = Input.GetMouseButton(LEFT_BUTTON);
         bool right = Input.GetMouseButton(RIGHT_BUTTON);
         bool chord = left && right;
         
-        if (!_isDragging && chord)
+        if (!chord)
         {
-            _isDragging = true;
-            _lastMousePosition = Input.mousePosition;
-        }
-        
-        if (_isDragging && !chord)
-        {
-            _isDragging = false;
+            _chordActive = false;
+            _filteredAxisX = 0f;
             
             return;
         }
 
-        if (!_isDragging)
+        if (!_chordActive)
+        {
+            _chordActive = true;
+            _filteredAxisX = 0f;
+        }
+
+        float rawAxisX = Input.GetAxisRaw("Mouse X");
+        _filteredAxisX = Mathf.Lerp(_filteredAxisX, rawAxisX, smoothingLerp01);
+
+        if (Mathf.Abs(_filteredAxisX) <= deadZoneUnits)
             return;
 
-        Vector2 current = Input.mousePosition;
-        Vector2 delta = current - _lastMousePosition;
-        _lastMousePosition = current;
+        float degrees = _filteredAxisX * settings.DesktopRotateSensitivity;
+        
+        if (maxDegreesPerFrame > 0f)
+            degrees = Mathf.Clamp(degrees, -maxDegreesPerFrame, maxDegreesPerFrame);
 
-        if (Mathf.Abs(delta.x) > Mathf.Epsilon)
-            RotatorInputed?.Invoke(delta.x * sensitivity);
+        if (Mathf.Abs(degrees) > Mathf.Epsilon)
+            RotatorInputed?.Invoke(degrees);
     }
 }

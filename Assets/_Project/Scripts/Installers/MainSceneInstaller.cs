@@ -58,7 +58,7 @@ public class MainSceneInstaller : MonoInstaller
         
         Bind(new CameraPanWithLag(_cameraTarget, _camera, moverAggregator, _cinemachineVirtualCamera, _cameraSettings));
 
-        var mouseChordedYawInput = Bind(new MouseChordedLRDragYawInput(_cameraSettings.DesktopRotateSensitivity, _cameraSettings.IgnoreWhenOverUI));
+        var mouseChordedYawInput = Bind(new MouseChordedLRDragYawInput(_cameraSettings, _cameraSettings.IgnoreWhenOverUI));
         var touchTwoFinger = Bind(new TouchTwistAndPinchGestureInput(_cameraSettings.MobileRotateSensitivity, _cameraSettings.MobilePinchZoomSensitivity, _cameraSettings.IgnoreWhenOverUI));
         var rotatorInputAggregator = Bind(new RotateInputAggregator(mouseChordedYawInput, touchTwoFinger));
 
