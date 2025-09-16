@@ -2207,7 +2207,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.31622776, y: 0.000000028272964, z: -0.000000009424321, w: 0.9486833}
+  m_LocalRotation: {x: 0.31622773, y: -6.5584876e-15, z: 3.3704004e-15, w: 0.9486833}
   m_LocalPosition: {x: 0, y: 7.5, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -8094,7 +8094,7 @@ MonoBehaviour:
   _sceneNamesData: {fileID: 11400000, guid: 530cc6998fc11484591cfc6ce1b50417, type: 2}
   _mainCamera: {fileID: 519420031}
   _gridComponent: {fileID: 1154843680}
-  _tilePrefab: {fileID: 1711470165231059853, guid: a1996a2aeeb41bb4cb67857807771fc3,
+  _tilePrefab: {fileID: 5502879757254291381, guid: 32e6831dba13d30459f1f1806f0b449c,
     type: 3}
   _cellPrefab: {fileID: 9136858816657127363, guid: 212096cd8fdf3b64c8c89c557f08612f,
     type: 3}
@@ -10520,7 +10520,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2055960777}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.31622776, y: 0.000000028272964, z: -0.000000009424321, w: 0.9486833}
+  m_LocalRotation: {x: 0.31622773, y: -6.5584876e-15, z: 3.3704004e-15, w: 0.9486833}
   m_LocalPosition: {x: 0, y: 7.5, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0

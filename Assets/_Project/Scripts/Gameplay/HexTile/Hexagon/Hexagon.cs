@@ -1,20 +1,21 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class Hexagon : MonoBehaviour
 {
+    private const float ROTATION_ANGEL = 60f;
+    private const int SIDES_COUNT = 6;
+    
     [SerializeField] private List<HexagonPart> _parts;
     
     private readonly HexType[] edgeTypes = new HexType[6];
-    private readonly float rotationAngel = 60f;
-    private readonly int sidesCount = 6;
 
     public int RotationSteps { get; private set; }
 
     private void Awake()
     {
-        DetermineParts();
+        CachePartsIntoEdges();
+        GuessInitialRotationFromTransform();
     }
 
     public void RotateSteps(int delta)
@@ -24,75 +25,57 @@ public class Hexagon : MonoBehaviour
 
     public HexType GetEdgeType(int sideInWorld)
     {
-        int localIndex = (sideInWorld - RotationSteps + sidesCount) % sidesCount;
+        int localIndex = (sideInWorld - RotationSteps + SIDES_COUNT) % SIDES_COUNT;
         
         return edgeTypes[localIndex];
     }
     
+    public void SetSideTypes(HexType[] sideTypesClockwiseFromSide0)
+    {
+        if (sideTypesClockwiseFromSide0 == null || sideTypesClockwiseFromSide0.Length != SIDES_COUNT)
+            throw new System.ArgumentException("Hexagon.SetSideTypes: массив должен содержать ровно 6 элементов.");
+
+        for (int i = 0; i < SIDES_COUNT; i++)
+            edgeTypes[i] = sideTypesClockwiseFromSide0[i];
+        
+        if (_parts != null)
+        {
+            foreach (HexagonPart part in _parts)
+            {
+                int sideIndex = (int)part.Side;
+                
+                if (sideIndex >= 0 && sideIndex < SIDES_COUNT)
+                    part.ApplyType(edgeTypes[sideIndex]);
+            }
+        }
+    }
+    
     private void SetRotationSteps(int steps)
     {
-        RotationSteps = (steps % sidesCount + sidesCount) % sidesCount;
-        transform.rotation = Quaternion.Euler(0f, RotationSteps * rotationAngel, 0f);
+        RotationSteps = (steps % SIDES_COUNT + SIDES_COUNT) % SIDES_COUNT;
+        transform.rotation = Quaternion.Euler(0f, RotationSteps * ROTATION_ANGEL, 0f);
     }
 
-    private void DetermineParts()
+    private void CachePartsIntoEdges()
     {
-        List<HexagonPart> outerParts = _parts
-            .Where(p => (int)p.Side >= 0 && (int)p.Side < sidesCount) 
-            .ToList();
-
-        if (outerParts.Count != sidesCount)
-        {
-            outerParts = transform.GetComponentsInChildren<HexagonPart>()
-                .Where(p =>
-                {
-                    Vector3 local = transform.InverseTransformPoint(p.transform.position);
-                    
-                    return new Vector2(local.x, local.z).magnitude > 0.01f;
-                })
-                .ToList();
-        }
-
-        List<(HexagonPart part, float angle)> list = new List<(HexagonPart part, float angle)>();
+        if (_parts == null || _parts.Count == 0)
+            _parts = new List<HexagonPart>(GetComponentsInChildren<HexagonPart>(true));
         
-        foreach (HexagonPart part in outerParts)
-        {
-            Vector3 local = transform.InverseTransformPoint(part.transform.position);
+        for (int i = 0; i < SIDES_COUNT; i++)
+            edgeTypes[i] = HexType.Grass;
 
-            float angle = Mathf.Atan2(local.z, local.x);
+        foreach (HexagonPart part in _parts)
+        {
+            int sideIndex = (int)part.Side;
             
-            list.Add((part, angle));
+            if (sideIndex >= 0 && sideIndex < SIDES_COUNT)
+                edgeTypes[sideIndex] = part.Type;
         }
-        
-        float upperLeftAngle = 3f * Mathf.PI / 4f;
-        
-        var normalized = list
-            .Select(item =>
-            {
-                float delta = item.angle - upperLeftAngle;
-                
-                while (delta < 0) 
-                    delta += 2 * Mathf.PI;
-                
-                while (delta >= 2 * Mathf.PI) 
-                    delta -= 2 * Mathf.PI;
+    }
 
-                float clockwise = (2 * Mathf.PI - delta) % (2 * Mathf.PI);
-                
-                return (part: item.part, sortKey: clockwise);
-            })
-            .OrderBy(x => x.sortKey)
-            .ToList();
-
-        for (int i = 0; i < sidesCount; i++)
-        {
-            if (i < normalized.Count)
-                edgeTypes[i] = normalized[i].part.Type;
-            else
-                edgeTypes[i] = HexType.Grass;
-        }
-        
-        int guessed = Mathf.RoundToInt(transform.eulerAngles.y / rotationAngel);
+    private void GuessInitialRotationFromTransform()
+    {
+        int guessed = Mathf.RoundToInt(transform.eulerAngles.y / ROTATION_ANGEL);
         
         SetRotationSteps(guessed);
     }

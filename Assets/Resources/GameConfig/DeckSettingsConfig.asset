@@ -12,21 +12,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a5a532cbf41404f9e560974cc29b352, type: 3}
   m_Name: DeckSettingsConfig
   m_EditorClassIdentifier: 
-  _tileViewPrefab: {fileID: 74657477308664834, guid: b6769f686775ec140bfd08ee99981770,
+  _tileViewPrefab: {fileID: 4330850152758508253, guid: fe5da728485222546894947edd6e4044,
     type: 3}
-  <DeckMaxSize>k__BackingField: 64
-  <DeckRefillBatch>k__BackingField: 16
-  <DistinctTypesAllowed>k__BackingField: 2
-  <ContinueSameChance>k__BackingField: 0.6
-  <StartPlacements>k__BackingField: 20
-  <BaseLocalOffset>k__BackingField: {x: 0, y: -9, z: 0}
-  <StackDirectionLocal>k__BackingField: {x: 0, y: 1, z: 0}
-  <PackedStep>k__BackingField: 0.15
-  <TilesLocalEuler>k__BackingField: {x: 0, y: 0, z: 0}
-  <HiddenTilesLocalScale>k__BackingField: {x: 1, y: 1, z: 1}
-  <TopTilesLocalScale>k__BackingField: {x: 1, y: 1, z: 1}
-  <Top1ExtraStep>k__BackingField: 0.55
-  <Top2ExtraStep>k__BackingField: 0.35
-  <Top3ExtraStep>k__BackingField: 0.15
-  <VisibleBelowTopCount>k__BackingField: 3
-  <PoolPreloadCount>k__BackingField: 32
+  _deckMaxSize: 64
+  _deckRefillBatch: 16
+  _distinctTypesAllowed: 2
+  _continueSameChance: 0.6
+  _startPlacements: 20
+  _baseLocalOffset: {x: 0, y: -9, z: 0}
+  _stackDirectionLocal: {x: 0, y: 1, z: 0}
+  _packedStep: 0.15
+  _tilesLocalEuler: {x: 0, y: 0, z: 0}
+  _hiddenTilesLocalScale: {x: 1, y: 1, z: 1}
+  _topTilesLocalScale: {x: 1, y: 1, z: 1}
+  _top1ExtraStep: 0.55
+  _top2ExtraStep: 0.35
+  _top3ExtraStep: 0.15
+  _visibleBelowTopCount: 3
+  _deckShiftSeconds: 1
+  _poolPreloadCount: 32

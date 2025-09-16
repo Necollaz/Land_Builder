@@ -25,6 +25,8 @@ public class HexDeckModel
     
     public int Count => queue.Count;
 
+    public HexTileData[] SnapshotAll() => queue.ToArray();
+    
     public HexTileData Draw()
     {
         if (queue.Count == 0)
@@ -35,6 +37,14 @@ public class HexDeckModel
         RefillIfNeeded(false);
         
         return data;
+    }
+    
+    public HexTileData PeekTop()
+    {
+        if (queue.Count == 0)
+            RefillIfNeeded(true);
+
+        return queue.Peek();
     }
 
     private void RefillIfNeeded(bool force)

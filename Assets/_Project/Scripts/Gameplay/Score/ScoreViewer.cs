@@ -19,6 +19,12 @@ public class ScoreViewer : MonoBehaviour
 
    private void Start()
    {
+      if (_score == null)
+      {
+         Debug.LogError($"{nameof(ScoreViewer)}: Score is not injected. Subscription skipped.");
+         return;
+      }
+      
       _score.Value.Subscribe(Change).AddTo(disposables);
       
       Change(_score.Value.Value);

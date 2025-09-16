@@ -9,20 +9,21 @@ public class TilePreviewController
     private readonly Hexagon tilePrefab;
     private readonly Transform container;
     private readonly TileRotateController rotateController;
+    private readonly HexDeckModel topDataProvider;
 
     private Hexagon _previewInstance;
     private Vector2Int? _previewCoordinates;
     private bool _isPreviewActive;
-
-    public Hexagon CurrentPreviewInstance => _previewInstance;
+    
     public Vector2Int? CurrentPreviewCoordinates => _previewCoordinates;
     public bool IsPreviewActive => _isPreviewActive;
 
-    public TilePreviewController(Hexagon tilePrefab, Transform container, TileRotateController rotateController)
+    public TilePreviewController(Hexagon tilePrefab, Transform container, TileRotateController rotateController, HexDeckModel topDataProvider)
     {
         this.tilePrefab = tilePrefab;
         this.container = container;
         this.rotateController = rotateController;
+        this.topDataProvider = topDataProvider;
     }
 
     public Hexagon CommitPreview()
@@ -44,7 +45,12 @@ public class TilePreviewController
 
         _previewCoordinates = coordinates;
         _previewInstance = Object.Instantiate(tilePrefab, worldPosition, Quaternion.identity, container);
-
+        
+        HexTileData top = topDataProvider.PeekTop();
+        
+        if (top != null)
+            _previewInstance.SetSideTypes(top.SideTypes);
+        
         _isPreviewActive = true;
 
         OnTilePut?.Invoke();
