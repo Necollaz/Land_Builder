@@ -13,12 +13,15 @@ public class HexDeckController
         this.view = view;
         this.preloadVisualsCount = Mathf.Max(1, preloadVisualsCount);
         
-        view.RebuildVisuals(model.Count, this.preloadVisualsCount);
+        view.SetSnapshot(model.SnapshotAll());
+        view.RebuildVisuals(this.preloadVisualsCount);
+        view.RefreshLayout();
     }
-
+    
     public void TilePlaced()
     {
         model.Draw();
-        view.ShiftAfterDraw(model.Count);
+        view.SetSnapshot(model.SnapshotAll());
+        view.ShiftAfterDraw();
     }
 }

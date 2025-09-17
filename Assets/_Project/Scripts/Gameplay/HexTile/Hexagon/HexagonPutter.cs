@@ -17,38 +17,53 @@ public class HexagonPutter : MonoBehaviour
     private TileSpawnController _tileSpawnController;
     private HexTileGridBuilder _tileGridBuilder;
     private HexGridController _hexGridController;
+    private HexSideHelper _sideHelper;
     private CameraController _cameraController;
-    private Vector2Int _pendingCoordinates;
     private HexCellView _pendingCell;
     private ScoreGiver _scoreGiver;
+    
+    private Vector2Int _pendingCoordinates;
+    
     private bool _hasPending;
+    private bool _subscribed;
     
     [Inject]
     public void Construct(TileSpawnController tileSpawnController, TilePreviewController tilePreviewController,
-        HexTileGridBuilder tileGridBuilder, CameraController cameraController, ScoreGiver scoreGiver)
+        HexTileGridBuilder tileGridBuilder, CameraController cameraController, ScoreGiver scoreGiver, HexSideHelper sideHelper)
     {
         _tileSpawnController = tileSpawnController;
         _tilePreviewController = tilePreviewController;
         _tileGridBuilder = tileGridBuilder;
         _cameraController = cameraController;
         _scoreGiver = scoreGiver;
+        _sideHelper = sideHelper;
     }
     
     private void OnEnable()
     {
-        _tileSpawnController.OnTilePut += SetHexagon;
-        _tileSpawnController.OnTileCanceled += SetActivePanelFalse;
-        _tileSpawnController.OnTileAcceptRequested += OnAgreeClicked;
-        _tileSpawnController.OnTileCancelRequested += OnCancelClicked;
+        if (_tileSpawnController != null)
+        {
+            _tileSpawnController.OnTilePut += SetHexagon;
+            _tileSpawnController.OnTileCanceled += SetActivePanelFalse;
+            _tileSpawnController.OnTileAcceptRequested += OnAgreeClicked;
+            _tileSpawnController.OnTileCancelRequested += OnCancelClicked;
+            _subscribed = true;
+        }
+        else
+        {
+            Debug.LogWarning($"{nameof(HexagonPutter)}: TileSpawnController is not injected yet.");
+        }
+
+        if (_agreeButton != null)
+            _agreeButton.onClick.AddListener(OnAgreeClicked);
         
-        _agreeButton.onClick.AddListener(OnAgreeClicked);
-        _cancelButton.onClick.AddListener(OnCancelClicked);
-        
+        if (_cancelButton != null)
+            _cancelButton.onClick.AddListener(OnCancelClicked);
+
         if (_rotateLeftButton != null)
-            _rotateLeftButton.onClick.AddListener(() => _tilePreviewController.RotatePreviewStep(-1));
-        
+            _rotateLeftButton.onClick.AddListener(() => _tilePreviewController?.RotatePreviewStep(-1));
         if (_rotateRightButton != null)
-            _rotateRightButton.onClick.AddListener(() => _tilePreviewController.RotatePreviewStep(+1));
+            _rotateRightButton.onClick.AddListener(() => _tilePreviewController?.RotatePreviewStep(+1));
 
         SetActivePanelFalse();
         SetRotateButtonsVisible(false);
@@ -56,14 +71,21 @@ public class HexagonPutter : MonoBehaviour
 
     private void OnDisable()
     {
-        _tileSpawnController.OnTilePut -= SetHexagon;
-        _tileSpawnController.OnTileCanceled -= SetActivePanelFalse;
-        _tileSpawnController.OnTileAcceptRequested -= OnAgreeClicked;
-        _tileSpawnController.OnTileCancelRequested -= OnCancelClicked;
+        if (_subscribed && _tileSpawnController != null)
+        {
+            _tileSpawnController.OnTilePut -= SetHexagon;
+            _tileSpawnController.OnTileCanceled -= SetActivePanelFalse;
+            _tileSpawnController.OnTileAcceptRequested -= OnAgreeClicked;
+            _tileSpawnController.OnTileCancelRequested -= OnCancelClicked;
+            _subscribed = false;
+        }
+
+        if (_agreeButton != null)
+            _agreeButton.onClick.RemoveListener(OnAgreeClicked);
         
-        _agreeButton.onClick.RemoveListener(OnAgreeClicked);
-        _cancelButton.onClick.RemoveListener(OnCancelClicked);
-        
+        if (_cancelButton != null)
+            _cancelButton.onClick.RemoveListener(OnCancelClicked);
+
         if (_rotateLeftButton != null)
             _rotateLeftButton.onClick.RemoveAllListeners();
         
@@ -103,8 +125,8 @@ public class HexagonPutter : MonoBehaviour
             if (!_hexGridController.TryGetTileAt(neighborCoords, out var neighborHex))
                 continue;
             
-            int sideNew = HexSideHelper.GetSideIndex(coords, neighborCoords);
-            int sideExist = HexSideHelper.GetSideIndex(neighborCoords, coords);
+            int sideNew = _sideHelper.GetSideIndex(coords, neighborCoords);
+            int sideExist = _sideHelper.GetSideIndex(neighborCoords, coords);
 
             HexType newType  = candidate.GetEdgeType(sideNew);
             HexType existType = neighborHex.GetEdgeType(sideExist);

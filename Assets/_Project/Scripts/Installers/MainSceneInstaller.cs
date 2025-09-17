@@ -35,46 +35,43 @@ public class MainSceneInstaller : MonoInstaller
     public override void InstallBindings()
     {
         var deckRandom = new System.Random();
-        var deckModel = Bind(new HexDeckModel(_deckSettings.DeckMaxSize, _deckSettings.DeckRefillBatch, _deckSettings.DistinctTypesAllowed, _deckSettings.ContinueSameChance, deckRandom));
-        var tilePool = Bind(new GameObjectPool<HexTileView>(_deckSettings.TileViewPrefab, _poolParent != null ? _poolParent : _deckRoot, _deckSettings.PoolPreloadCount));
+        var deckModel = Bind(new HexDeckModel(_deckSettings.DeckMaxSize, _deckSettings.DeckRefillBatch, _deckSettings.DistinctTypesAllowed,
+            _deckSettings.ContinueSameChance, deckRandom));
+        var tilePool = Bind(new GameObjectPool<HexTileView>(_deckSettings.TileViewPrefab, _poolParent != null ? _poolParent : _deckRoot,
+            _deckSettings.PoolPreloadCount));
         var deckView = Bind(new HexDeckView(_deckRoot, tilePool, _deckSettings.BaseLocalOffset, _deckSettings.StackDirectionLocal,
             _deckSettings.HiddenTilesLocalScale, _deckSettings.TopTilesLocalScale, Quaternion.Euler(_deckSettings.TilesLocalEuler),
-            _deckSettings.PackedStep, _deckSettings.Top1ExtraStep, _deckSettings.Top2ExtraStep, _deckSettings.Top3ExtraStep, _deckSettings.VisibleBelowTopCount));
+            _deckSettings.PackedStep, _deckSettings.Top1ExtraStep, _deckSettings.Top2ExtraStep, _deckSettings.Top3ExtraStep,
+            _deckSettings.VisibleBelowTopCount, _deckSettings.DeckShiftSeconds));
         var deckController = Bind(new HexDeckController(deckModel, deckView, _deckSettings.DeckMaxSize));
-        
         var cameraController = Bind(new CameraController(_mainCamera));
-        
-        var hexDirection = Bind(new HexDirection());
-        var gridBuilder = Bind(new HexTileGridBuilder(Container, _gridComponent, _cellPrefab, hexDirection));
-        
-        var tileRotator = Bind(new TileRotateController());
-        var tilePreview = Bind(new TilePreviewController(_tilePrefab, _containerTilePrefabs, tileRotator));
-        var tileSpawn = Bind(new TileSpawnController(tilePreview, _gridComponent));
-        var hexInitializer = Bind(new HexGridInitializer(gridBuilder, tileSpawn, hexDirection, _hexagonPutter));
-        
         var cameraTouchMover = Bind(new TouchDragPanInput(_cameraSettings.MobilePanSensitivity, _cameraSettings.MobilePanInvert, _cameraSettings.IgnoreWhenOverUI));
         var cameraMouseMover = Bind(new MouseDragPanInput(_cameraSettings.DesktopPanSensitivity, _cameraSettings.DesktopPanInvert, _cameraSettings.IgnoreWhenOverUI));
         var moverAggregator = Bind(new PanInputAggregator(cameraMouseMover, cameraTouchMover));
-        
-        Bind(new CameraPanWithLag(_cameraTarget, _camera, moverAggregator, _cinemachineVirtualCamera, _cameraSettings));
-
+        var cameraPanWithLag = Bind(new CameraPanWithLag(_cameraTarget, _camera, moverAggregator, _cinemachineVirtualCamera, _cameraSettings));
         var mouseChordedYawInput = Bind(new MouseChordedLRDragYawInput(_cameraSettings, _cameraSettings.IgnoreWhenOverUI));
         var touchTwoFinger = Bind(new TouchTwistAndPinchGestureInput(_cameraSettings.MobileRotateSensitivity, _cameraSettings.MobilePinchZoomSensitivity, _cameraSettings.IgnoreWhenOverUI));
         var rotatorInputAggregator = Bind(new RotateInputAggregator(mouseChordedYawInput, touchTwoFinger));
-
-        Bind(new OrbitYawAroundTarget(_cameraTarget, rotatorInputAggregator,  _cinemachineVirtualCamera, _cameraSettings));
-
+        var orbitYawAroundTarget = Bind(new OrbitYawAroundTarget(_cameraTarget, rotatorInputAggregator, _cinemachineVirtualCamera, _cameraSettings));
         var mouseDragZoomInput = Bind(new MouseHoldDragZoomInput(_cameraSettings.DesktopWheelZoomSensitivity, _cameraSettings.IgnoreWhenOverUI));
         var zoomAggregator = Bind(new ZoomInputAggregator(mouseDragZoomInput, touchTwoFinger));
+        var hexDirection = Bind(new HexDirection());
+        var sideHelper = Bind(new HexSideHelper());
+        var gridBuilder = Bind(new HexTileGridBuilder(Container, _gridComponent, _cellPrefab, hexDirection));
+        var tileRotator = Bind(new TileRotateController());
+        var tilePreview = Bind(new TilePreviewController(_tilePrefab, _containerTilePrefabs, tileRotator, deckModel));
+        var tileSpawn   = Bind(new TileSpawnController(tilePreview, _gridComponent));
         var score = Bind(new Score());
+        var scoreGiver = Bind(new ScoreGiver(score));
         
-        Bind(new ScoreGiver(score));
-        Bind(new OrthoZoomWithCinemachine(_cinemachineVirtualCamera, zoomAggregator, _cameraSettings.ZoomSpeed, _cameraSettings.MinZoom, _cameraSettings.MaxZoom));
-        Bind(new DeckPlacementListener(gridBuilder, deckController));
+        Container.Inject(_hexagonPutter);
         
+        var hexInitializer = Bind(new HexGridInitializer(gridBuilder, tileSpawn, hexDirection, _hexagonPutter));
+        var orthoZoomWithCinemachine = Bind(new OrthoZoomWithCinemachine(_cinemachineVirtualCamera, zoomAggregator, _cameraSettings.ZoomSpeed, _cameraSettings.MinZoom, _cameraSettings.MaxZoom));
+        var deckPlacementListener = Bind(new DeckPlacementListener(gridBuilder, deckController));
         var progressService = Bind(new ProgressService());
         var levelLoader = Bind(new LevelLoader(score, hexInitializer));
-        Bind(new LevelSelectionController(levelLoader, progressService));
+        var levelSelectionController = Bind(new LevelSelectionController(levelLoader, progressService));
         
         BindPlacementBudgetSubsystem(gridBuilder);
     }
