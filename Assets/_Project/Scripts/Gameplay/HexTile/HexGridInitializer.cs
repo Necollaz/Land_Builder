@@ -10,7 +10,7 @@ public class HexGridInitializer : IInitializable, IDisposable
     private readonly HexDirection hexDirection;
     private readonly HexagonPutter hexagonPutter;
 
-    public HexGridController HexGridController { get; private set; }
+    private HexGridController _hexGridController;
 
     public HexGridInitializer(
         HexTileGridBuilder tileGridBuilder,
@@ -37,11 +37,11 @@ public class HexGridInitializer : IInitializable, IDisposable
 
     private void HandleBuildCompleted(Dictionary<Vector2Int, HexCellView> map, Vector2Int position)
     {
-        HexGridController = new HexGridController(map, hexDirection);
+        _hexGridController = new HexGridController(map, hexDirection);
 
-        hexagonPutter.SetGridController(HexGridController);
+        hexagonPutter.SetGridController(_hexGridController);
 
-        tileSpawnController.Initialize(HexGridController, map);
+        tileSpawnController.Initialize(_hexGridController, map);
 
         tileGridBuilder.OnBuildCompleted -= HandleBuildCompleted;
     }

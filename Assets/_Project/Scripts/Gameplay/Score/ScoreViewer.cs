@@ -1,14 +1,14 @@
-using System;
+using UnityEngine;
 using TMPro;
 using UniRx;
-using UnityEngine;
 using Zenject;
 
 public class ScoreViewer : MonoBehaviour
 {
    [SerializeField] private TextMeshProUGUI _textScore;
    
-   private CompositeDisposable _disposables = new ();
+   private readonly CompositeDisposable disposables = new ();
+   
    private Score _score;
    
    [Inject]
@@ -19,20 +19,24 @@ public class ScoreViewer : MonoBehaviour
 
    private void Start()
    {
-      _score.Value
-         .Subscribe(Change)
-         .AddTo(_disposables);
+      if (_score == null)
+      {
+         Debug.LogError($"{nameof(ScoreViewer)}: Score is not injected. Subscription skipped.");
+         return;
+      }
+      
+      _score.Value.Subscribe(Change).AddTo(disposables);
       
       Change(_score.Value.Value);
    }
 
    private void OnDestroy()
    {
-      _disposables.Dispose();
+      disposables.Dispose();
    }
 
    private void Change(int value)
    {
-      _textScore.text = "Score: " + value;
+      _textScore.text = value.ToString();
    }
 }

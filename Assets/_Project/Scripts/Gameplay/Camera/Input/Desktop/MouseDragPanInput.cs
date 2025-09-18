@@ -18,13 +18,22 @@ public class MouseDragPanInput : ICameraMoverInputProvider, ITickable
     {
         this.mouseButton = mouseButton;
         this.ignoreWhenOverUI = ignoreWhenOverUI;
-        this.effectiveSensitivity = invert ? -Mathf.Abs(sensitivity) : Mathf.Abs(sensitivity);
+        effectiveSensitivity = invert ? -Mathf.Abs(sensitivity) : Mathf.Abs(sensitivity);
     }
 
     void ITickable.Tick()
     {
         if (ignoreWhenOverUI && EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
             return;
+
+        bool chord = Input.GetMouseButton(0) && Input.GetMouseButton(1);
+        
+        if (chord)
+        {
+            _isDragging = false;
+            
+            return;
+        }
 
         if (Input.GetMouseButtonDown(mouseButton))
         {
@@ -41,7 +50,7 @@ public class MouseDragPanInput : ICameraMoverInputProvider, ITickable
         Vector2 currentPosition = Input.mousePosition;
         Vector2 deltaPixels = currentPosition - _lastPosition;
         Vector2 delta = deltaPixels * effectiveSensitivity;
-        
+
         _lastPosition = currentPosition;
 
         if (delta != Vector2.zero)

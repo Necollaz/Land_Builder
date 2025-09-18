@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1822a58d42f54362815d9b9e710dc95c, type: 3}
+  m_Name: SettingsDefaults
+  m_EditorClassIdentifier: 
+  MusicEnabledByDefault: 1
+  SoundEnabledByDefault: 1
+  VibrationEnabledByDefault: 1
+  Use60FpsByDefault: 1
+  SupportUrl: https://example.com/support
