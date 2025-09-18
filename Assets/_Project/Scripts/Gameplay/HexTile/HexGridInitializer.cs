@@ -27,7 +27,7 @@ public class HexGridInitializer : IInitializable, IDisposable
     void IInitializable.Initialize()
     {
         tileGridBuilder.OnBuildCompleted += HandleBuildCompleted;
-        tileGridBuilder.Build(Vector2Int.zero);
+        //tileGridBuilder.Build(Vector2Int.zero);
     }
 
     void IDisposable.Dispose()

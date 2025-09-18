@@ -3,18 +3,16 @@ using UnityEngine;
 
 public class LoadingScreen : MonoBehaviour
 {
-    [SerializeField] private GameObject _view; // сам экран (панель) на Canvas
-
-    /// <summary>Показать загрузочный экран</summary>
+    [SerializeField] private GameObject _view;
+    
     public async Task Show()
     {
         if (_view != null)
             _view.SetActive(true);
 
-        await Task.Yield(); // чтобы можно было вызывать как async
+        await Task.Yield();
     }
-
-    /// <summary>Скрыть загрузочный экран</summary>
+    
     public async Task Hide()
     {
         if (_view != null)

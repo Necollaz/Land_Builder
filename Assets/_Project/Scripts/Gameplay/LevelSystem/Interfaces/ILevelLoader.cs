@@ -1,7 +1,7 @@
-using Cysharp.Threading.Tasks;
+using System.Threading.Tasks;
 
 public interface ILevelLoader
 {
-    public UniTask LoadLevel(LevelConfig config);
-    public UniTask UnloadLevel();
+    public Task LoadLevel(LevelConfig config);
+    public Task UnloadLevel();
 }

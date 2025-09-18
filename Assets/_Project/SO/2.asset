@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e00defb3a319b8a4080c59c00f017672, type: 3}
-  m_Name: New Level Config 1
+  m_Name: 2
   m_EditorClassIdentifier: 
   <LevelId>k__BackingField: 2
   <RewardCoins>k__BackingField: 40
   <RequiredScore>k__BackingField: 40
   <StartHexagons>k__BackingField: 15
-  <MapPosition>k__BackingField: {x: 10, y: 10}
-  <NextLevels>k__BackingField: []
+  <NextLevels>k__BackingField:
+  - {fileID: 11400000, guid: d7e18cc13fc2f8644b84659c596e6d4e, type: 2}

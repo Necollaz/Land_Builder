@@ -21,6 +21,7 @@ public class HexagonPutter : MonoBehaviour
     private CameraController _cameraController;
     private HexCellView _pendingCell;
     private ScoreGiver _scoreGiver;
+    [SerializeField] private LevelLoader _levelLoader;
     
     private Vector2Int _pendingCoordinates;
     
@@ -166,6 +167,8 @@ public class HexagonPutter : MonoBehaviour
         ClearPending();
         SetActivePanelFalse();
         SetRotateButtonsVisible(false);
+        _levelLoader.OnHexagonPlaced();
+
     }
 
     private void OnCancelClicked()

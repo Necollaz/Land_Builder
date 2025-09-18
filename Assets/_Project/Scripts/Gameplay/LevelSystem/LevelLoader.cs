@@ -1,43 +1,74 @@
 using System.Threading.Tasks;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
+using Zenject;
+using UniRx;
 
-public class LevelLoader : ILevelLoader
+public class LevelLoader : MonoBehaviour, ILevelLoader
 {
-    private readonly Score _score;
-    private readonly HexGridInitializer _hexGridInitializer;
+    [Header("UI")]
+    [SerializeField] private GameObject _levelSelectPanel;
+    [SerializeField] private GameObject _gameplayUI;
+    [SerializeField] private GameObject _winPanel;
+    [SerializeField] private GameObject _losePanel;
 
-    private LevelConfig _currentLevel;
+    private Score _score;
+    private HexTileGridBuilder _gridBuilder;
+    private HexGridInitializer _initializer;
     private LoadingScreen _loadingScreen;
+    private int _remainingHexagons;
+    private LevelConfig _current;
 
-    public LevelLoader(Score score, HexGridInitializer gridInitializer, LoadingScreen loadingScreen)
+    [Inject]
+    public void Construct(
+        Score score,
+        HexTileGridBuilder gridBuilder,
+        HexGridInitializer initializer,
+        LoadingScreen loadingScreen)
     {
         _score = score;
-        _hexGridInitializer = gridInitializer;
+        _gridBuilder = gridBuilder;
+        _initializer = initializer;
         _loadingScreen = loadingScreen;
+        print(1111);
     }
 
-    public async UniTask LoadLevel(LevelConfig config)
+    public async Task LoadLevel(LevelConfig cfg)
     {
-        _currentLevel = config;
-        
+        _current = cfg;
+
+        _levelSelectPanel.SetActive(false);
         await _loadingScreen.Show();
 
-        _score.SetValueForWin(config.RequiredScore);
         _score.Value.Value = 0;
-        
-        /*for (int i = 0; i < config.StartHexagons; i++)
-        {
-            
-        }*/
-        
-        await Task.Delay(1000);
+        _score.SetValueForWin(cfg.RequiredScore);
+        _remainingHexagons = cfg.StartHexagons;
 
+        _gridBuilder.Build(Vector2Int.zero);
+
+        _gameplayUI.SetActive(true);
+        await Task.Delay(500);
         await _loadingScreen.Hide();
+
+        _score.OnValueEnd
+            .Subscribe(_ => OnWin())
+            .AddTo(this);
     }
 
-    public async UniTask UnloadLevel()
+    public Task UnloadLevel() => Task.CompletedTask;
+
+    private void OnWin()
     {
-        await UniTask.Yield();//сделать сброс текущих гексагонов
+        _winPanel.SetActive(true);
+        _gameplayUI.SetActive(false);
+    }
+
+    public void OnHexagonPlaced()
+    {
+        _remainingHexagons--;
+        if (_remainingHexagons <= 0 && _score.Value.Value < _current.RequiredScore)
+        {
+            _losePanel.SetActive(true);
+            _gameplayUI.SetActive(false);
+        }
     }
 }

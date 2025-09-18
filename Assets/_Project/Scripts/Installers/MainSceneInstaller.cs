@@ -1,5 +1,6 @@
 using UnityEngine;
 using Cinemachine;
+using UnityEngine.Serialization;
 using Zenject;
 
 public class MainSceneInstaller : MonoInstaller
@@ -31,6 +32,9 @@ public class MainSceneInstaller : MonoInstaller
     
     [Header("UI")]
     [SerializeField] private ScoreViewer _scoreViewer;
+    [SerializeField] private LoadingScreen _loadingScreen;
+    [SerializeField] private LevelConfig[] _levelConfigs;
+    [SerializeField] private LevelLoader _levelLoader;
     
     public override void InstallBindings()
     {
@@ -69,10 +73,12 @@ public class MainSceneInstaller : MonoInstaller
         var hexInitializer = Bind(new HexGridInitializer(gridBuilder, tileSpawn, hexDirection, _hexagonPutter));
         var orthoZoomWithCinemachine = Bind(new OrthoZoomWithCinemachine(_cinemachineVirtualCamera, zoomAggregator, _cameraSettings.ZoomSpeed, _cameraSettings.MinZoom, _cameraSettings.MaxZoom));
         var deckPlacementListener = Bind(new DeckPlacementListener(gridBuilder, deckController));
-        var progressService = Bind(new ProgressService());
-        var levelLoader = Bind(new LevelLoader(score, hexInitializer));
-        var levelSelectionController = Bind(new LevelSelectionController(levelLoader, progressService));
         
+        var progressService = Bind(new ProgressService());
+
+        _levelLoader.Construct(score, gridBuilder, hexInitializer, _loadingScreen);
+        var levelSelectionController = Bind(new LevelSelectionController(_levelLoader, progressService));
+
         BindPlacementBudgetSubsystem(gridBuilder);
     }
     
