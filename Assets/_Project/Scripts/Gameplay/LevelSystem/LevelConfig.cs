@@ -12,5 +12,7 @@ public class LevelConfig : ScriptableObject
     
     [field: SerializeField] public int StartHexagons { get; private set; }
     
+    [field: SerializeField] public Vector2 MapPosition { get; private set; }
+    
     [field: SerializeField] public List<LevelConfig> NextLevels { get; private set; }
 }

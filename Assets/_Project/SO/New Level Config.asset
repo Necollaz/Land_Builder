@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e00defb3a319b8a4080c59c00f017672, type: 3}
+  m_Name: New Level Config
+  m_EditorClassIdentifier: 
+  <LevelId>k__BackingField: 1
+  <RewardCoins>k__BackingField: 30
+  <RequiredScore>k__BackingField: 30
+  <StartHexagons>k__BackingField: 10
+  <MapPosition>k__BackingField: {x: 0, y: 0}
+  <NextLevels>k__BackingField:
+  - {fileID: 11400000, guid: 6d9c7fa2b91342049b001cd24201d2ab, type: 2}

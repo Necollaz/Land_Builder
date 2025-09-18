@@ -27,6 +27,9 @@ public class MainSceneInstaller : MonoInstaller
     
     [Header("UI")]
     [SerializeField] private ScoreViewer _scoreViewer;
+    [SerializeField] private LevelMapController _levelMapController;
+    [SerializeField] private LevelConfig[] _levels;
+    [SerializeField] private LoadingScreen _loadingScreen;
     
     public override void InstallBindings()
     {
@@ -67,9 +70,13 @@ public class MainSceneInstaller : MonoInstaller
         Bind(new ScoreGiver(score));
         Bind(new OrthoZoomWithCinemachine(_cinemachineVirtualCamera, zoomAggregator, _cameraSettings.ZoomSpeed, _cameraSettings.MinZoom, _cameraSettings.MaxZoom));
         Bind(new DeckPlacementListener(gridBuilder, deckController));
+        
+        
         var progressService = Bind(new ProgressService());
-        var levelLoader = Bind(new LevelLoader(score, hexInitializer));
-        Bind(new LevelSelectionController(levelLoader, progressService));
+        var levelLoader = Bind(new LevelLoader(score, hexInitializer, _loadingScreen));
+        var levelController =  Bind(new LevelSelectionController(levelLoader, progressService));
+        _levelMapController.Construct(progressService, levelController);
+        Bind(new MapInitializer(_levelMapController, _levels));
     }
 
     private T Bind<T>(T controller) where T : class

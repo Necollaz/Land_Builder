@@ -1,23 +1,25 @@
-using Cysharp.Threading.Tasks;
+using System.Threading.Tasks;
 using UnityEngine;
 
-public static class LoadingScreen
+public class LoadingScreen : MonoBehaviour
 {
-    private static GameObject _view;
+    [SerializeField] private GameObject _view; // сам экран (панель) на Canvas
 
-    public static async UniTask Show()
+    /// <summary>Показать загрузочный экран</summary>
+    public async Task Show()
     {
-        if (_view == null)
-            _view = Object.Instantiate(Resources.Load<GameObject>("LoadingScreen"));
+        if (_view != null)
+            _view.SetActive(true);
 
-        _view.SetActive(true);
-
-        await UniTask.Yield();
+        await Task.Yield(); // чтобы можно было вызывать как async
     }
 
-    public static async UniTask Hide()
+    /// <summary>Скрыть загрузочный экран</summary>
+    public async Task Hide()
     {
-        _view.SetActive(false);
-        await UniTask.Yield();
+        if (_view != null)
+            _view.SetActive(false);
+
+        await Task.Yield();
     }
 }
