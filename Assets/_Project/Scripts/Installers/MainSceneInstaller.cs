@@ -74,10 +74,12 @@ public class MainSceneInstaller : MonoInstaller
         var orthoZoomWithCinemachine = Bind(new OrthoZoomWithCinemachine(_cinemachineVirtualCamera, zoomAggregator, _cameraSettings.ZoomSpeed, _cameraSettings.MinZoom, _cameraSettings.MaxZoom));
         var deckPlacementListener = Bind(new DeckPlacementListener(gridBuilder, deckController));
         
-        var progressService = Bind(new ProgressService());
+        var saveService = Bind(new SaveService());
+        
+        var progressService = Bind(new ProgressService(saveService));
 
-        _levelLoader.Construct(score, gridBuilder, hexInitializer, _loadingScreen);
         var levelSelectionController = Bind(new LevelSelectionController(_levelLoader, progressService));
+        _levelLoader.Construct(score, gridBuilder, hexInitializer, _loadingScreen, levelSelectionController);
 
         BindPlacementBudgetSubsystem(gridBuilder);
     }

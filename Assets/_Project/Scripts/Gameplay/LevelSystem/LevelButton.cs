@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -5,17 +6,34 @@ using Zenject;
 public class LevelButton : MonoBehaviour
 {
     [SerializeField] private LevelConfig _config;
-    
-    [SerializeField] private LevelLoader _loader;
-    
-    public void Construct(LevelLoader loader)
+    [SerializeField] private Button _button;
+    [SerializeField] private GameObject _lockIcon;
+
+    private LevelSelectionController _selection;
+    private IProgressService _progress;
+
+    [Inject]
+    public void Construct(LevelSelectionController selection, IProgressService progress)
     {
-        //_loader = loader;
-       // print(22222);
+        _selection = selection;
+        _progress = progress;
     }
 
-    private void Awake()
+    private void Start()
     {
-        GetComponent<Button>().onClick.AddListener(() => _loader.LoadLevel(_config));
+        _button.onClick.AddListener(OnClick);
+        Refresh();
+    }
+
+    public void Refresh()
+    {
+        bool unlocked = _progress.IsLevelUnlocked(_config.LevelId);
+        _button.interactable = unlocked;
+        if (_lockIcon != null) _lockIcon.SetActive(!unlocked);
+    }
+
+    private void OnClick()
+    {
+        _selection.SelectLevel(_config).Forget();
     }
 }

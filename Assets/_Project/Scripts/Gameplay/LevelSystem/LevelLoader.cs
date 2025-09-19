@@ -17,19 +17,21 @@ public class LevelLoader : MonoBehaviour, ILevelLoader
     private LoadingScreen _loadingScreen;
     private int _remainingHexagons;
     private LevelConfig _current;
+    private LevelSelectionController _levelSelectionController;
 
     [Inject]
     public void Construct(
         Score score,
         HexTileGridBuilder gridBuilder,
         HexGridInitializer initializer,
-        LoadingScreen loadingScreen)
+        LoadingScreen loadingScreen,
+        LevelSelectionController levelSelectionController)
     {
         _score = score;
         _gridBuilder = gridBuilder;
         _initializer = initializer;
         _loadingScreen = loadingScreen;
-        print(1111);
+        _levelSelectionController = levelSelectionController;
     }
 
     public async Task LoadLevel(LevelConfig cfg)
@@ -58,6 +60,8 @@ public class LevelLoader : MonoBehaviour, ILevelLoader
 
     private void OnWin()
     {
+        _levelSelectionController.CompleteLevel(_current);
+        
         _winPanel.SetActive(true);
         _gameplayUI.SetActive(false);
     }
